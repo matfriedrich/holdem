@@ -1,0 +1,31 @@
+body {
+  font: 14px Arial, sans-serif;
+  margin: 0px;
+}
+.header h1 {
+  font-size: 30px;
+  text-align: center;
+}
+.flex_container {
+  width: 100%;
+  height: 100%;
+  background: #18d9eb;
+  display: flex;
+  flex-direction: column;
+}
+
+#canvas {
+  width: 100%;
+  padding: 20px 20px;
+  background: #acb3b9;
+  text-align: center;
+  min-height: 500px;
+}
+
+#bottom {
+  width: 100%;
+  padding: 20px 20px;
+  background: #ba1fda;
+  text-align: center;
+  min-height: 100px;
+}
