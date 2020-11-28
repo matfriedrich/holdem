@@ -1,12 +1,12 @@
 const http = require('http')
 var node_static = require('node-static');
-var WebSocketServer = require('websocket').server;
-
+const WebSocket = require('ws');
 const Client = require('./model/Client');
 
 
-const hostname = '127.0.0.1'
-const port = process.env.PORT
+const hostname = '127.0.0.1';
+const webserverPort = process.env.PORT;
+const websocketPort = process.env.WSPORT;
 
 var file = new(node_static.Server)('../src');
 
@@ -14,31 +14,40 @@ const server = http.createServer((req, res) => {
     file.serve(req, res);
 })
 
-wsServer = new WebSocketServer({
-    httpServer: server,
-    //TODO: should implement CORS check here, wont do
-    autoAcceptConnections: true
+
+const wss = new WebSocket.Server({
+    port: websocketPort,
+    perMessageDeflate: {
+        zlibDeflateOptions: {
+            // See zlib defaults.
+            chunkSize: 1024,
+            memLevel: 7,
+            level: 3
+        },
+        zlibInflateOptions: {
+            chunkSize: 10 * 1024
+        },
+        // Other options settable:
+        clientNoContextTakeover: true, // Defaults to negotiated value.
+        serverNoContextTakeover: true, // Defaults to negotiated value.
+        serverMaxWindowBits: 10, // Defaults to negotiated value.
+        // Below options specified as default values.
+        concurrencyLimit: 10, // Limits zlib concurrency for perf.
+        threshold: 1024 // Size (in bytes) below which messages
+        // should not be compressed.
+    }
 });
 
-wsServer.on('request', function(request) {
-    var connection = request.accept('echo-protocol', request.origin);
-    console.log((new Date()) + ' Connection accepted.');
-    connection.on('message', function(message) {
-        if (message.type === 'utf8') {
-            console.log('Received Message: ' + message.utf8Data);
-            connection.sendUTF(message.utf8Data);
-        }
-        else if (message.type === 'binary') {
-            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-            connection.sendBytes(message.binaryData);
-        }
+wss.on('connection', function connection(ws) {
+    ws.on('message', function incoming(message) {
+        console.log('received: %s', JSON.parse(message));
+
+        ws.send(JSON.stringify(message));
     });
-    connection.on('close', function(reasonCode, description) {
-        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
-    });
+
+
 });
 
-
-server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`)
+server.listen(webserverPort, hostname, () => {
+    console.log(`Server running at http://${hostname}:${webserverPort}/`)
 })

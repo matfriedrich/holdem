@@ -8,6 +8,6 @@ A web-based multiplayer Texas Hold'em game for up to four players.
 ### Environment Variables
 Following environment variables need to be set before running the server:
 * PORT - the port the server will listen on
-
+* WSPORT - the port the websocket will listen on
 ### Starting the server
 node server.js
