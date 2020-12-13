@@ -2,11 +2,13 @@ const http = require('http')
 var node_static = require('node-static');
 const WebSocket = require('ws');
 const Client = require('./model/Client');
+const PokerTable = require('./model/pokertable');
+const pokerTable = new PokerTable();
 
 
 const hostname = '127.0.0.1';
-const webserverPort = process.env.PORT;
-const websocketPort = process.env.WSPORT;
+const webserverPort = process.env.PORT || 8080;
+const websocketPort = process.env.WSPORT || 8080;
 
 var file = new(node_static.Server)('../src');
 
@@ -41,8 +43,8 @@ const wss = new WebSocket.Server({
 wss.on('connection', function connection(ws) {
     ws.on('message', function incoming(message) {
         console.log('received: %s', JSON.parse(message));
-
-        ws.send(JSON.stringify(message));
+        
+        handleMessage(ws, message);
     });
 
 
@@ -51,3 +53,37 @@ wss.on('connection', function connection(ws) {
 server.listen(webserverPort, hostname, () => {
     console.log(`Server running at http://${hostname}:${webserverPort}/`)
 })
+
+
+function handleMessage(ws, message) {
+    const msg = JSON.parse(message);
+
+    switch(msg.type) {
+        case "join":
+            console.log('Received join from client');
+            wss.clients.forEach(function each(client) {
+                if (client.readyState === WebSocket.OPEN) {
+                  client.send(JSON.stringify(addPlayer()));
+                }
+              });
+            break;
+        case "action":
+            c.handleAction();
+            break;
+    }
+
+}
+
+function addPlayer () {
+
+    var status = 'fail';
+    var player = pokerTable.addPlayer();
+
+    if(player) {
+        status = 'success';
+    }
+    
+    var message = {type: 'join', status: status, player: player};
+
+    return message;
+}

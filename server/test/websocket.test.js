@@ -16,7 +16,7 @@
 
 const testObject = {username: 'testuser', ip: '192.168.0.1'};
 
-var connection = new WebSocket('ws://localhost:82' , ['soap', 'xmpp']);
+var connection = new WebSocket('ws://localhost:8080' , ['soap', 'xmpp']);
 
 // When the connection is open, send some data to the server
 connection.onopen = function () {

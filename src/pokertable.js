@@ -6,6 +6,6 @@ class PokerTable {
     this.players = []
   }
   addPlayer(player) {
-    this.players.add(player)
+    this.players.push(player)
   }
 }
