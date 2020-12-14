@@ -1,3 +1,5 @@
+const Player = require('./player');
+
 class PokerTable {
     constructor() {
       console.log("PokerTable")
@@ -5,16 +7,20 @@ class PokerTable {
       this.game_running = 0
       this.players = []
     }
-    addPlayer(player) {
+    addPlayer() {
+        var status = 'fail';
+        var newPlayer = new Player(0, 1000); 
+
         if(this.players.length < 4) {
-            this.players.push(player);
-            return this.players.length;
+            newPlayer.id = this.players.length + 1;
+            this.players.push(newPlayer);
+            status = 'success';
         }
-        else {
-            return 0;
-        }
-        
-        
+
+        var message = {type: 'join', status: status, player: {id: newPlayer.id, 
+            balance: newPlayer.balance}};
+
+        return message;
     }
   }
   

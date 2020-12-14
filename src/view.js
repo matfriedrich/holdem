@@ -6,6 +6,7 @@ class View {
     this.title.textContent = 'Texas Holdem';
 
     this.joinButton = this.createElement('Button');
+    this.joinButton.id = 'joinButton';
     this.joinButton.textContent = 'Join Game';
 
     this.app.append(this.title, this.joinButton);
@@ -25,6 +26,14 @@ class View {
     const element = document.querySelector(selector);
 
     return element;
+  }
+
+  removeElement(id) {
+    var element = document.getElementById(id);
+    if(element !== null) {
+      element.parentNode.removeChild(element);
+    }
+    
   }
 
   bindJoin(handler){

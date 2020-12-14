@@ -3,6 +3,7 @@ class PokerTable {
     console.log("PokerTable")
     this.pot = 0
     this.game_running = 0
+    this.player
     this.players = []
   }
   addPlayer(player) {

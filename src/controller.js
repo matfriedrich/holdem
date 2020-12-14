@@ -12,11 +12,21 @@ class Controller {
     sendMessage(message);
   }
 
-  handleJoin (msg) {
-    if(msg.status === 'success') {
-      this.model.pokertable.addPlayer(new Player(msg.player, 1000));
+  handleJoin(msg) {
+    if(msg.status === 'fail') {
+      alert('Table is already full!');
+      return;
     }
-    console.log('Player ' + msg.player + ' has joined');
+    this.model.pokertable.player = new Player(msg.player.id, msg.player.balance);
+    
+    console.log('Player ' + msg.player.id + ' has joined');
+
+    this.view.removeElement('joinButton');
+  }
+
+  handleOtherJoin(msg) {
+    this.model.pokertable.addPlayer(new Player(msg.player.id, msg.player.balance));
+    console.log('Player ' + msg.player.id + ' has joined');
   }
 
   startGame() {
@@ -60,11 +70,13 @@ connection.onmessage = function (e) {
       case "join":
         c.handleJoin(msg);
         break;
+      case "otherJoin":
+        c.handleOtherJoin(msg);
       case "action":
-        c.handleAction();
+        c.handleAction(msg);
         break;
       case "result":
-        c.handleResult();
+        c.handleResult(msg);
         break;
     }
 };
