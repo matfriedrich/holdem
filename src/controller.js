@@ -17,20 +17,28 @@ class Controller {
       alert('Table is already full!');
       return;
     }
-    this.model.pokertable.player = new Player(msg.player.id, msg.player.balance);
     
+    this.model.setPlayerId(msg.player.id);
+    msg.existingplayers.forEach(element => this.model.addPlayer(new Player(element)));
+    this.model.addPlayer(new Player(msg.player.id, msg.player.balance));
     console.log('Player ' + msg.player.id + ' has joined');
 
     this.view.removeElement('joinButton');
+    this.view.displayTable(this.model.pokertable);
   }
 
-  handleOtherJoin(msg) {
-    this.model.pokertable.addPlayer(new Player(msg.player.id, msg.player.balance));
+  handleOtherPlayerJoin(msg) {
+    this.model.addPlayer(new Player(msg.player.id, msg.player.balance));
     console.log('Player ' + msg.player.id + ' has joined');
   }
 
   startGame() {
-    // todo
+    this.view.updateTable(this.model.pokertable);
+    this.startNewRound();
+  }
+
+  startNewRound() {
+    
   }
 
   handleAction() {
@@ -41,6 +49,9 @@ class Controller {
 
   }
 
+  onGameStatusChange = (pokertable) => {
+    this.view.updateTable(pokertable);
+  }
   
 }
 
@@ -71,7 +82,11 @@ connection.onmessage = function (e) {
         c.handleJoin(msg);
         break;
       case "otherJoin":
-        c.handleOtherJoin(msg);
+        c.handleOtherPlayerJoin(msg);
+        break;
+      case "start":
+        c.startGame();
+        break;
       case "action":
         c.handleAction(msg);
         break;

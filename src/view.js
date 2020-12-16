@@ -5,11 +5,22 @@ class View {
     this.title = this.createElement('h1');
     this.title.textContent = 'Texas Holdem';
 
+    this.main = this.createElement('div');
+    this.main.className = 'flex-container';
+    this.tableTitle = this.createElement('h2');
+    this.tableTitle.textContent = 'Table';
+
+    this.canvas = this.createElement('div');
+    this.canvas.id = 'canvas';
+    this.options = this.createElement('div');
+    this.options.id = 'options'
+
     this.joinButton = this.createElement('Button');
     this.joinButton.id = 'joinButton';
     this.joinButton.textContent = 'Join Game';
 
-    this.app.append(this.title, this.joinButton);
+    this.main.append(this.joinButton);
+    this.app.append(this.title, this.main);
 
   }
 
@@ -42,6 +53,48 @@ class View {
 
       handler();
     })
+  }
+
+  displayTable(pokertable) {
+    // Todo: Canvas stuff 
+    this.main.append(this.tableTitle, this.canvas, this.options);
+  }
+
+  updateTable(pokertable) {
+    // Todo: Canvas stuff 
+
+    
+    while (this.canvas.firstChild) {
+      this.canvas.removeChild(this.canvas.firstChild);
+    }
+
+    var pot = this.createElement('p');
+    pot.textContent = 'Pot: ' + pokertable.pot.toString();
+
+    var flop = this.createElement('p');
+    flop.textContent = 'First: ' + pokertable.flop[0] + ' Second: ' + pokertable.flop[1] +
+      ' Third: ' + pokertable.flop[2]; 
+
+    var turn = this.createElement('p');
+    turn.textContent = 'Turn: ' + pokertable.turn;
+
+    var river = this.createElement('p');
+    river.textContent = 'River: ' + pokertable.river;
+
+    var player1 = this.createElement('p');
+    player1.textContent = 'Player ' + pokertable.players[0].id.toString(); 
+
+    var player2 = this.createElement('p');
+    player2.textContent = 'Player ' + pokertable.players[1].id.toString(); 
+
+    var player3 = this.createElement('p');
+    player3.textContent = 'Player ' + pokertable.players[2].id.toString(); 
+
+    var player4 = this.createElement('p');
+    player4.textContent = 'Player ' + pokertable.players[3].id.toString(); 
+
+    this.canvas.append(pot, flop, turn, river, player1, 
+      player2, player3, player4);
   }
 }
 
