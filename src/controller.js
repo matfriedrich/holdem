@@ -4,11 +4,17 @@ class Controller {
     this.view = new View()
 
     this.view.bindJoin(this.sendJoin)
-    this.game_started = 0
+    this.view.bindAction(this.sendAction)
+    this.model.bindPokertableChanged(this.onPokertableChanged)
   }
 
   sendJoin = () => {
     const message = {type: 'join'};
+    sendMessage(message);
+  }
+
+  sendAction = (action) => {
+    const message = {type: 'action', player: this.model.getPlayerId(), action: action};
     sendMessage(message);
   }
 
@@ -32,24 +38,15 @@ class Controller {
     console.log('Player ' + msg.player.id + ' has joined');
   }
 
-  startGame() {
-    this.view.updateTable(this.model.pokertable);
-    this.startNewRound();
-  }
-
-  startNewRound() {
-    
-  }
-
-  handleAction() {
-    // todo
+  handleRound(msg) {
+    this.model.updatePokertable(msg);
   }
 
   handleResult() {
 
   }
 
-  onGameStatusChange = (pokertable) => {
+  onPokertableChanged = (pokertable) => {
     this.view.updateTable(pokertable);
   }
   
@@ -84,8 +81,8 @@ connection.onmessage = function (e) {
       case "otherJoin":
         c.handleOtherPlayerJoin(msg);
         break;
-      case "start":
-        c.startGame();
+      case "tablestatus":
+        c.handleRound(msg);
         break;
       case "action":
         c.handleAction(msg);

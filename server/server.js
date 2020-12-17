@@ -76,16 +76,18 @@ function handleMessage(ws, message) {
             
             if(pokerTable.players.length === 4)
             {
-                console.log('Sending start signal');
-                var payload = {type: 'start'};
-                pokerTable.players.forEach(function each(player) {
-                    player.connection.send(JSON.stringify(payload));
+                var payload = JSON.stringify(pokerTable.processRound());
+                pokerTable.connections.forEach(function each(player) {
+                    player.send(payload);
                 });
             }
 
             break;
         case "action":
-            c.handleAction();
+            var payload = JSON.stringify(pokerTable.processRound(msg));
+                pokerTable.connections.forEach(function each(player) {
+                    player.send(payload);
+                });
             break;
     }
 

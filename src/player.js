@@ -3,23 +3,36 @@ class Player {
     console.log("Player")
     this.id = id
     this.balance = balance
+    this.bet
     this.card0
     this.card1
   }
 
   setCard0(card) {
-    card0 = card
+    this.card0 = card
   } 
 
   getCard0(){
-    return card0;
+    return this.card0;
   }
 
   setCard1(card) {
-    card1 = card
-    }
+    this.card1 = card
+  }
 
   getCard1(){
-    return card1;
+    return this.card1;
+  }
+
+  setBalance(balance) {
+    this.balance = balance;
+  }
+
+  getBet() {
+    return this.bet;
+  }
+
+  setBet(bet) {
+    this.bet = bet;
   }
 }

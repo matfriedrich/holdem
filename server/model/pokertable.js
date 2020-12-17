@@ -5,7 +5,7 @@ const suits = {
     spades: 3,
   }
   
-  const values = {
+const values = {
     two: 2,
     three: 3,
     four: 4,
@@ -21,37 +21,55 @@ const suits = {
     ace: 14,
   }
 
+const states = {
+    idle: 0,
+    preflop: 1,
+    flop: 2,
+    turn: 3,
+    river: 4,
+    result: 5
+}
+
+const blinds = {
+    smallblind: 10,
+    bigblind: 20
+}
+
 const Player = require('./player');
 const Card = require('./card');
 
 class PokerTable {
     constructor() {
-      console.log("PokerTable")
+      this.state  
       this.pot = 0
-      this.game_running = 0
+      this.dealer = 0
+      this.activePlayer
       this.players = []
       this.flop = []
       this.turn
       this.river
       this.deck = []
+      this.options = []
+      this.connections = []
       this.shuffleDeck();
     }
+
     addPlayer(ws) {
         var status = 'fail';
-        var newPlayer = new Player(0, 1000, ws); 
+        var newPlayer = new Player(0, 1000); 
 
         var existingPlayers = [];
         this.players.forEach(element => existingPlayers.push(element.id));
         
 
         if(this.players.length < 4) {
-            newPlayer.id = this.players.length + 1;
+            newPlayer.setId(this.players.length + 1);
             this.players.push(newPlayer);
             status = 'success';
+            this.connections.push(ws);
         }
 
-        var message = {type: 'join', status: status, player: {id: newPlayer.id, 
-            balance: newPlayer.balance}, existingplayers: existingPlayers};
+        var message = {type: 'join', status: status, player: newPlayer, existingplayers: existingPlayers};
 
         return message;
     }
@@ -75,20 +93,68 @@ class PokerTable {
        }
        
        for(i = 0; i < 3; i++) {
-            flop[i] = this.selectRandomCard(); 
+            this.flop[i] = this.selectRandomCard(); 
        }
 
        this.turn = this.selectRandomCard();
        this.river = this.selectRandomCard();
-
     }
 
     selectRandomCard() {
-        var index =  Math.floor(Math.random() * 52);
+        var index =  Math.floor(Math.random() * this.deck.length);
+        //console.log('index ' + index);
         var card = this.deck[index];
-        this.deck = this.deck.splice(index, 1);
+        this.deck.splice(index, 1);
+        //console.log('value: ' + card.value + ' suite ' + card.suit);
 
         return card;
+    }
+
+    processRound(msg = null) {
+        if(msg === null) {
+            this.dealCards();
+            this.players[this.dealer + 1].bet = blinds["smallblind"];
+            this.players[this.dealer + 2].bet = blinds["bigblind"];
+            this.activePlayer = (this.dealer + 3);
+
+            this.options = ['Raise', 'Call', 'Fold'];
+
+            return this.packTableAsMessage();
+        }
+
+        if(msg.player !== this.activePlayer) {
+            console.log('Action not from active player - something is wrong');
+            return 'fail'; 
+        }
+
+
+    }
+
+    packTableAsMessage() {
+        var flop = [0, 0, 0]; 
+        var turn = 0;
+        var river = 0;
+
+        switch(this.state) {
+            case states.flop: 
+                flop = this.flop;
+                break;
+            case states.turn: 
+                flop = this.flop;
+                turn = this.turn;
+                break;
+            case states.river: 
+                flop = this.flop;
+                turn = this.turn;
+                river = this.river;
+                break;
+        }
+
+        var message  = {type: 'tablestatus', state: this.state, pot: this.pot, 
+            dealer: this.dealer, activePlayer: this.activePlayer, players: this.players,
+            flop: flop, turn: turn, river: river, options: this.options};
+
+        return message;
     }
 
   }

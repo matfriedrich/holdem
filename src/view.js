@@ -55,6 +55,13 @@ class View {
     })
   }
 
+  bindAction(handler){
+    this.options.addEventListener('click', event => {
+
+      handler(event.target.textContent);
+    })
+  }
+
   displayTable(pokertable) {
     // Todo: Canvas stuff 
     this.main.append(this.tableTitle, this.canvas, this.options);
@@ -64,8 +71,11 @@ class View {
     // Todo: Canvas stuff 
 
     
-    while (this.canvas.firstChild) {
+    while(this.canvas.firstChild) {
       this.canvas.removeChild(this.canvas.firstChild);
+    }
+    while(this.options.firstChild) {
+      this.options.removeChild(this.options.firstChild);
     }
 
     var pot = this.createElement('p');
@@ -81,20 +91,29 @@ class View {
     var river = this.createElement('p');
     river.textContent = 'River: ' + pokertable.river;
 
-    var player1 = this.createElement('p');
-    player1.textContent = 'Player ' + pokertable.players[0].id.toString(); 
+    var players = [];
+    var i;
 
-    var player2 = this.createElement('p');
-    player2.textContent = 'Player ' + pokertable.players[1].id.toString(); 
+    for(i = 0; i < pokertable.players.length; i++) {
+      players.push(this.createElement('p'));
+      players[i].textContent = 'Player ' + pokertable.players[i].id.toString() + ' Balance: ' + 
+      pokertable.players[i].balance.toString() + ' Card0: ' + pokertable.players[i].card0.value +
+        ' ' + pokertable.players[i].card0.suit + ' Card1: ' + pokertable.players[i].card1.value +
+        ' ' + pokertable.players[i].card1.suit + ' Bet: ' + pokertable.players[i].bet;
+    }
+    
+    this.canvas.append(pot, flop, turn, river, players[0], 
+      players[1], players[2], players[3]);
+    
+    var j; 
 
-    var player3 = this.createElement('p');
-    player3.textContent = 'Player ' + pokertable.players[2].id.toString(); 
-
-    var player4 = this.createElement('p');
-    player4.textContent = 'Player ' + pokertable.players[3].id.toString(); 
-
-    this.canvas.append(pot, flop, turn, river, player1, 
-      player2, player3, player4);
+    if(pokertable.isActivePlayer) {
+      for(j = 0; j < pokertable.options.length; j++) {
+        var button = this.createElement('button');
+        button.textContent = pokertable.options[j];
+        this.options.append(button);
+      }
+    }
   }
 }
 
