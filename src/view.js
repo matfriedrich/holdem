@@ -101,9 +101,16 @@ class View {
         ' ' + pokertable.players[i].card0.suit + ' Card1: ' + pokertable.players[i].card1.value +
         ' ' + pokertable.players[i].card1.suit + ' Bet: ' + pokertable.players[i].bet;
     }
+
+    var lastaction = this.createElement('p'); 
+    lastaction.textContent = pokertable.lastAction;
+    
+    var result = this.createElement('p'); 
+    result.textContent = pokertable.result;
+
     
     this.canvas.append(pot, flop, turn, river, players[0], 
-      players[1], players[2], players[3]);
+      players[1], players[2], players[3], lastaction, result);
     
     var j; 
 

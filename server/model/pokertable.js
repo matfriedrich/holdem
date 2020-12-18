@@ -56,6 +56,7 @@ const options = {
 
 const Player = require('./player');
 const Card = require('./card');
+const { set } = require('mongoose')
 
 class PokerTable {
     constructor() {
@@ -70,6 +71,8 @@ class PokerTable {
       this.deck = []
       this.options = []
       this.connections = []
+      this.lastAction
+      this.result
       this.shuffleDeck();
     }
 
@@ -129,19 +132,58 @@ class PokerTable {
         return card;
     }
 
-    startRound(msg = null) {
-        if(msg === null) {
-            this.dealCards();
-            this.players[this.dealer + 1].setBet(blinds.smallblind);
-            this.players[this.dealer + 1].setPrevaction(actions.smallblind);
-            this.players[this.dealer + 2].setBet(blinds.bigblind);
-            this.players[this.dealer + 2].setPrevaction(actions.bigblind);
-            this.activePlayer = (this.dealer + 3);
+    placeBet(player, amount) {
+        player.setBet(amount);
+        this.pot += amount;
+    }
 
-            this.options = [options.raise, options.call, options.fold];
-
-            return this.packTableAsMessage();
+    incrementActivePlayer() {
+        var i = 1;
+        while(!this.players[(this.activePlayer + i) % 4]) {
+            i++;
         }
+        this.activePlayer = (this.activePlayer + i) % 4;
+    }
+
+    incrementDealer() {
+        this.dealer = (this.dealer + 1) % 4;
+    }
+
+    playersLeft() {
+        var i = 0;
+        var playersleft = [];
+
+        for(i = 0; i < this.players.length; i++) {
+            if(this.players[i].getIsActive()) {
+                playersleft.push(this.players[i]);
+            }
+        }
+        return playersleft;
+    }
+
+    startRound() {
+        var i;
+
+        for(i = 0; i < this.players.length; i++) {
+            this.players[i].setBet(0);
+            this.players[i].setPrevaction(actions.noaction);
+            this.players[i].setIsActive(true);
+        }
+
+        this.state = states.preflop;
+        this.pot = 0;
+        this.shuffleDeck();
+        this.dealCards();
+        this.incrementDealer();
+        this.lastAction = 'New Round';
+        this.result = '';
+        this.placeBet(this.players[(this.dealer + 1) % 4], blinds.smallblind);
+        this.players[(this.dealer + 1) % 4].setPrevaction(actions.smallblind);
+        this.placeBet(this.players[(this.dealer + 2) % 4], blinds.bigblind);
+        this.players[(this.dealer + 2) % 4].setPrevaction(actions.bigblind);
+        this.activePlayer = (this.dealer + 3) % 4;
+
+        this.options = [options.raise, options.call, options.fold];
     }
 
     processAction(msg) {
@@ -150,21 +192,31 @@ class PokerTable {
             return 'fail'; 
         }
 
+        this.lastAction = 'Player ' + this.activePlayer + ' ' + msg.action;
+
         switch(msg.action) {
             case 'Raise': 
                 break;
             case 'Call': 
                 break;
             case 'Fold': 
-
+                this.players[msg.player].setIsActive(false);
+                var playersleft = this.playersLeft();
+                if(playersleft.length === 1) {
+                    this.resolveRound(playersleft[0]);
+                    break;
+                }
+                this.incrementActivePlayer();
                 break;
             case 'Check': 
                 break;
         }
+    }
 
-
-
-        return this.packTableAsMessage();
+    resolveRound(winner) {
+        this.result = 'Player ' + winner.id + ' has won ' + this.pot;
+        winner.setBalance(winner.getBalance() + this.pot);
+        this.state = states.result;
     }
 
     packTableAsMessage() {
@@ -189,13 +241,14 @@ class PokerTable {
 
         var message  = {type: 'tablestatus', state: this.state, pot: this.pot, 
             dealer: this.dealer, activePlayer: this.activePlayer, players: this.players,
-            flop: flop, turn: turn, river: river, options: this.options};
+            flop: flop, turn: turn, river: river, options: this.options, 
+            lastaction: this.lastAction, result: this.result};
 
         return message;
     }
 
     determineWinner(handslist) {
-        
+
     }
 
   }

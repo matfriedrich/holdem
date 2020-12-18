@@ -76,18 +76,29 @@ function handleMessage(ws, message) {
             
             if(pokerTable.players.length === 4)
             {
-                var payload = JSON.stringify(pokerTable.startRound());
+                pokerTable.startRound();
+                var payload = pokerTable.packTableAsMessage();
                 pokerTable.connections.forEach(function each(player) {
-                    player.send(payload);
+                    player.send(JSON.stringify(payload));
                 });
             }
 
             break;
         case "action":
-            var payload = JSON.stringify(pokerTable.startRound(msg));
+            pokerTable.processAction(msg);
+            var payload = pokerTable.packTableAsMessage(msg);
                 pokerTable.connections.forEach(function each(player) {
-                    player.send(payload);
+                    player.send(JSON.stringify(payload));
                 });
+
+            if(pokerTable.state === 5) {
+                setTimeout(function wait() {}, 3000);
+                pokerTable.startRound(msg)
+                var payload = pokerTable.packTableAsMessage(msg);
+                    pokerTable.connections.forEach(function each(player) {
+                        player.send(JSON.stringify(payload));
+                });
+            }
             break;
     }
 

@@ -10,6 +10,8 @@ class PokerTable {
     this.river
     this.turn
     this.options
+    this.lastAction
+    this.result
   }
 
   addPlayer(player) {
@@ -44,6 +46,8 @@ class PokerTable {
     this.river = msg.river;
 
     this.options = msg.options;
+    this.lastAction = msg.lastaction;
+    this.result = msg.result;
   }
 
   setPlayerId(id) {
