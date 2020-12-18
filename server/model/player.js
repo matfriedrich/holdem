@@ -1,13 +1,14 @@
 const Card = require('./card');
 
 class Player {
-    constructor(id, balance, ws) {
+    constructor(id, balance, action) {
       this.id = id
       this.balance = balance
       this.bet = 0
       this.card0
       this.card1
-      this.connection = ws
+      this.prevaction = action
+      this.isactive = true
     }
 
     setCard0(card) {
@@ -23,7 +24,7 @@ class Player {
     }
 
     getCard1(){
-        return card1;
+        return this.card1;
     }
 
     setBalance(balance) {
@@ -49,6 +50,22 @@ class Player {
 
     getBet() {
         return this.bet;
+    }
+
+    setPrevaction(action) {
+        this.prevaction = action;
+    }
+
+    getBet() {
+        return this.prevaction;
+    }
+
+    setIsActive(bool) {
+        this.isactive = bool;
+    }
+
+    getIsActive() {
+        return this.isactive;
     }
 
 

@@ -35,6 +35,25 @@ const blinds = {
     bigblind: 20
 }
 
+const actions = {
+    raise: 0,
+    call: 1,
+    check: 2,
+    fold: 3,
+    allin: 4,
+    smallblind: 5,
+    bigblind: 6,
+    noaction: 7
+}
+
+const options = {
+    raise: 'Raise',
+    call: 'Call',
+    check: 'Check',
+    fold: 'Fold',
+    allin: 'All In'
+}
+
 const Player = require('./player');
 const Card = require('./card');
 
@@ -56,14 +75,14 @@ class PokerTable {
 
     addPlayer(ws) {
         var status = 'fail';
-        var newPlayer = new Player(0, 1000); 
+        var newPlayer = new Player(0, 1000, actions.noaction); 
 
         var existingPlayers = [];
         this.players.forEach(element => existingPlayers.push(element.id));
         
 
         if(this.players.length < 4) {
-            newPlayer.setId(this.players.length + 1);
+            newPlayer.setId(this.players.length);
             this.players.push(newPlayer);
             status = 'success';
             this.connections.push(ws);
@@ -110,24 +129,42 @@ class PokerTable {
         return card;
     }
 
-    processRound(msg = null) {
+    startRound(msg = null) {
         if(msg === null) {
             this.dealCards();
-            this.players[this.dealer + 1].bet = blinds["smallblind"];
-            this.players[this.dealer + 2].bet = blinds["bigblind"];
+            this.players[this.dealer + 1].setBet(blinds.smallblind);
+            this.players[this.dealer + 1].setPrevaction(actions.smallblind);
+            this.players[this.dealer + 2].setBet(blinds.bigblind);
+            this.players[this.dealer + 2].setPrevaction(actions.bigblind);
             this.activePlayer = (this.dealer + 3);
 
-            this.options = ['Raise', 'Call', 'Fold'];
+            this.options = [options.raise, options.call, options.fold];
 
             return this.packTableAsMessage();
         }
+    }
 
+    processAction(msg) {
         if(msg.player !== this.activePlayer) {
             console.log('Action not from active player - something is wrong');
             return 'fail'; 
         }
 
+        switch(msg.action) {
+            case 'Raise': 
+                break;
+            case 'Call': 
+                break;
+            case 'Fold': 
 
+                break;
+            case 'Check': 
+                break;
+        }
+
+
+
+        return this.packTableAsMessage();
     }
 
     packTableAsMessage() {
@@ -155,6 +192,10 @@ class PokerTable {
             flop: flop, turn: turn, river: river, options: this.options};
 
         return message;
+    }
+
+    determineWinner(handslist) {
+        
     }
 
   }

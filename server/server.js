@@ -76,7 +76,7 @@ function handleMessage(ws, message) {
             
             if(pokerTable.players.length === 4)
             {
-                var payload = JSON.stringify(pokerTable.processRound());
+                var payload = JSON.stringify(pokerTable.startRound());
                 pokerTable.connections.forEach(function each(player) {
                     player.send(payload);
                 });
@@ -84,7 +84,7 @@ function handleMessage(ws, message) {
 
             break;
         case "action":
-            var payload = JSON.stringify(pokerTable.processRound(msg));
+            var payload = JSON.stringify(pokerTable.startRound(msg));
                 pokerTable.connections.forEach(function each(player) {
                     player.send(payload);
                 });
