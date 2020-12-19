@@ -1,25 +1,6 @@
-const suits = {
-  clubs: 0,
-  diamonds: 1,
-  hearts: 2,
-  spades: 3,
-}
+const suits = ["c", "d", "h", "s"]
 
-const values = {
-  two: 2,
-  three: 3,
-  four: 4,
-  five: 5,
-  six: 6,
-  seven: 7,
-  eight: 8,
-  nine: 9,
-  ten: 10,
-  jack: 11,
-  queen: 12,
-  king: 13,
-  ace: 14,
-}
+const values = [2, 3, 4, 5, 6, 7, 8, 9, "T", "J", "Q", "K", "A"]
 
 const states = {
   idle: 0,
@@ -103,10 +84,10 @@ class PokerTable {
 
   shuffleDeck() {
     this.deck = []
-    for (var suit in suits) {
-      for (var value in values) {
-        this.deck.push(new Card(value, suit))
-        //console.log('Value ' + value + ' Suit ' + suit);
+    for (var v = 0; v < values.length; v++) {
+      for (var s = 0; s < suits.length; s++) {
+        this.deck.push(new Card(values[v], suits[s]))
+        //console.log("Value " + values[v] + " Suit " + suits[s])
       }
     }
   }
@@ -266,67 +247,44 @@ class PokerTable {
     var return_winners = []
     var players_hands = new Map()
     var solved_hands = []
-    var flop0 = this.convertCard(this.flop[0])
-    var flop1 = this.convertCard(this.flop[1])
-    var flop2 = this.convertCard(this.flop[2])
-    var turn = this.convertCard(this.turn)
-    var river = this.convertCard(this.river)
+    var converted_flop0 = this.convertCard(this.flop[0])
+    var converted_flop1 = this.convertCard(this.flop[1])
+    var converted_flop2 = this.convertCard(this.flop[2])
+    var converted_turn = this.convertCard(this.turn)
+    var converted_river = this.convertCard(this.river)
 
-    this.players.forEach(function (player) {
-      var card0 = convertCard(player.getCard0())
-      var card1 = convertCard(player.getCard1())
+    for (var i = 0; i < this.players.length; i++) {
+      var converted_card0 = this.convertCard(this.players[i].getCard0())
+      var converted_card1 = this.convertCard(this.players[i].getCard1())
       var hand = []
-      hand.push(card0, card1, flop0, flop1, flop2, turn, river)
+      hand.push(
+        converted_card0,
+        converted_card1,
+        converted_flop0,
+        converted_flop1,
+        converted_flop2,
+        converted_turn,
+        converted_river
+      )
       var solved_hand = Hand.solve(hand)
-      players_hands.set(player, solved_hand)
+      players_hands.set(this.players[i], solved_hand)
       solved_hands.push(solved_hand)
-    })
+    }
+
     var winners = Hand.winners(solved_hands)
-    this.players.forEach(function (player) {
-      if (winners.includes(players_hands.get(player))) {
-        return_winners.push(player)
+
+    for (var i = 0; i < this.players.length; i++) {
+      if (winners.includes(players_hands.get(this.players[i]))) {
+        return_winners.push(this.players[i])
       }
-    })
+    }
+    console.log("Winners:")
     console.log(return_winners)
     return return_winners
   }
 
   convertCard(card) {
-    var result = ""
-    switch (card.value) {
-      case values.ten:
-        result.concat("T")
-        break
-      case values.jack:
-        result.concat("J")
-        break
-      case values.queen:
-        result.concat("Q")
-        break
-      case values.king:
-        result.concat("K")
-        break
-      case values.ace:
-        result.concat("A")
-        break
-      default:
-        result.concat(card.value.toString())
-    }
-    switch (card.suit) {
-      case suits.clubs:
-        result.concat("c")
-        break
-      case suits.diamonds:
-        result.concat("d")
-        break
-      case suits.hearts:
-        result.concat("h")
-        break
-      case suits.spades:
-        result.concat("s")
-        break
-    }
-    return result
+    return card.value.toString().concat(card.suit.toString())
   }
 }
 
