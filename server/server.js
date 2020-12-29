@@ -7,7 +7,7 @@ const pokerTable = new PokerTable();
 
 
 const hostname = '127.0.0.1';
-const webserverPort = process.env.PORT || 8080;
+const webserverPort = process.env.PORT || 8088;
 const websocketPort = process.env.WSPORT || 8080;
 
 var file = new(node_static.Server)('../src');
