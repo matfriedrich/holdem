@@ -43,8 +43,12 @@ class Player {
         return this.id;
     }
 
+    resetBet() {
+        this.bet = 0
+    }
+
     setBet(bet) {
-        this.bet = bet;
+        this.bet += bet;
         this.balance -= bet; 
     }
 
@@ -56,7 +60,7 @@ class Player {
         this.prevaction = action;
     }
 
-    getBet() {
+    getPrevaction() {
         return this.prevaction;
     }
 

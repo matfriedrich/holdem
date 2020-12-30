@@ -82,14 +82,15 @@ class View {
     pot.textContent = 'Pot: ' + pokertable.pot.toString();
 
     var flop = this.createElement('p');
-    flop.textContent = 'First: ' + pokertable.flop[0] + ' Second: ' + pokertable.flop[1] +
-      ' Third: ' + pokertable.flop[2]; 
+    flop.textContent = 'First: ' + pokertable.flop[0].value + ' ' + pokertable.flop[0].suit 
+        + ' Second: ' + pokertable.flop[1].value + ' ' + pokertable.flop[1].suit +
+      ' Third: ' + pokertable.flop[2].value + ' ' + pokertable.flop[2].suit; 
 
     var turn = this.createElement('p');
-    turn.textContent = 'Turn: ' + pokertable.turn;
+    turn.textContent = 'Turn: ' + pokertable.turn.value + ' ' + pokertable.turn.suit;
 
     var river = this.createElement('p');
-    river.textContent = 'River: ' + pokertable.river;
+    river.textContent = 'River: ' + pokertable.river.value + ' ' + pokertable.river.suit;
 
     var players = [];
     var i;
