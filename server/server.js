@@ -75,12 +75,14 @@ function handleMessage(ws, message) {
             }
             
             if(pokerTable.players.length === 4)
-            {
-                pokerTable.startRound();
-                var payload = pokerTable.packTableAsMessage();
-                pokerTable.connections.forEach(function each(player) {
-                    player.send(JSON.stringify(payload));
-                });
+            {   
+                setTimeout(function() {
+                    pokerTable.startRound();
+                    var payload = pokerTable.packTableAsMessage();
+                    pokerTable.connections.forEach(function each(player) {
+                        player.send(JSON.stringify(payload));
+                    });
+                }, 2000);
             }
 
             break;
@@ -92,12 +94,14 @@ function handleMessage(ws, message) {
                 });
 
             if(pokerTable.state === 5) {
-                setTimeout(function wait() {}, 3000);
-                pokerTable.startRound(msg)
-                var payload = pokerTable.packTableAsMessage(msg);
-                    pokerTable.connections.forEach(function each(player) {
-                        player.send(JSON.stringify(payload));
-                });
+                setTimeout(function() {
+                    pokerTable.startRound(msg)
+                    var payload = pokerTable.packTableAsMessage(msg);
+                        pokerTable.connections.forEach(function each(player) {
+                            player.send(JSON.stringify(payload));
+                    });
+                }, 3000);
+                
             }
             break;
     }

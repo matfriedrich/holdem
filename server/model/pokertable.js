@@ -55,7 +55,7 @@ class PokerTable {
     this.lastAction
     this.result
     this.currentHighestBet
-    this.winningHand
+    this.winningHand = ""
     this.shuffleDeck()
   }
 
@@ -220,8 +220,8 @@ class PokerTable {
     switch (msg.action) {
       case "Raise":
         this.players[msg.player].setPrevaction(actions.raise)
-        if(this.currentHighestBet = 0) { 
-          this.currentHighestBet = 40
+        if(this.currentHighestBet == 0) { 
+          this.currentHighestBet = 20
         }
         this.currentHighestBet *= 2
         this.placeBet(this.players[msg.player], this.currentHighestBet - this.players[msg.player].getBet())
@@ -253,7 +253,7 @@ class PokerTable {
         this.players[msg.player].setIsActive(false)
         var playersleft = this.playersLeft()
         if (playersleft.length === 1) {
-          this.resolveRound(playersleft[0])
+          this.resolveRound(playersleft)
           break
         }
         this.incrementActivePlayer()
@@ -262,12 +262,15 @@ class PokerTable {
   }
 
   resolveRound(winners) {
+    console.log('Resolving round')
     var i
     for (i = 0; i < winners.length; i++) {
       winners[i].setBalance(winners[i].getBalance() + this.pot/winners.length)
       this.result += "Player " + winners[i].getId() + " has won " + this.pot/winners.length + ' ' + this.winningHand
+      console.log(this.result)
     }
     this.state = states.result
+    this.options = []
   }
 
   packTableAsMessage() {
