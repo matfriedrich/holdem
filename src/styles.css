@@ -25,13 +25,21 @@ body {
   padding: 20px 20px;
   background: #acb3b9;
   text-align: center;
-  min-height: 500px;
+  min-height: 400px;
 }
 
 #options {
   width: 100%;
   padding: 20px 20px;
   background: #ba1fda;
+  text-align: center;
+  min-height: 100px;
+}
+
+#allinDrop {
+  width: 100%;
+  padding: 20px 20px;
+  background: #22eb8d;
   text-align: center;
   min-height: 100px;
 }

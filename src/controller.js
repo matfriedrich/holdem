@@ -5,11 +5,12 @@ class Controller {
 
     this.view.bindJoin(this.sendJoin)
     this.view.bindAction(this.sendAction)
+    this.view.bindDrop(this.sendAllin)
     this.model.bindPokertableChanged(this.onPokertableChanged)
   }
 
-  sendJoin = () => {
-    const message = { type: "join" }
+  sendJoin = (username) => {
+    const message = { type: "join" , name: username}
     sendMessage(message)
   }
 
@@ -22,26 +23,38 @@ class Controller {
     sendMessage(message)
   }
 
+  sendAllin = (ev) => {
+    var data = ev.dataTransfer.getData("text");
+    console.log('data ' + data);
+    ev.target.appendChild(document.getElementById(data));
+
+    const message = {
+      type: "action",
+      player: this.model.getPlayerId(),
+      action: 'All In',
+    }
+    sendMessage(message)
+  }
+
   handleJoin(msg) {
     if (msg.status === "fail") {
       alert("Table is already full!")
       return
     }
 
+
     this.model.setPlayerId(msg.player.id)
-    msg.existingplayers.forEach((element) =>
-      this.model.addPlayer(new Player(element))
-    )
-    this.model.addPlayer(new Player(msg.player.id, msg.player.balance))
-    console.log("Player " + msg.player.id + " has joined")
+    this.model.setPlayers(msg.existingplayers)
+    console.log("Player " + msg.player.username + " has joined")
 
     this.view.removeElement("joinButton")
+    this.view.removeElement("usernameinput")
     this.view.displayTable(this.model.pokertable)
   }
 
   handleOtherPlayerJoin(msg) {
-    this.model.addPlayer(new Player(msg.player.id, msg.player.balance))
-    console.log("Player " + msg.player.id + " has joined")
+    this.model.setPlayers(msg.existingplayers)
+    console.log("Player " + msg.player.username + " has joined")
   }
 
   handleRound(msg) {
@@ -49,10 +62,13 @@ class Controller {
   }
 
   handleResult(msg) {
-    if (isGameWon(msg)) {
+    
+    if (this.isGameWon(msg)) {
       this.model.storeResult(true)
+      alert('You won the game! Congratulations')
     } else {
       this.model.storeResult(false)
+      alert('Player ' + msg.winner + ' has won')
     }
     location.reload()
   }
@@ -60,6 +76,12 @@ class Controller {
   onPokertableChanged = (pokertable) => {
     this.view.updateTable(pokertable)
   }
+
+  isGameWon(message) {
+    if (message.winner === this.model.getPlayerId()) return true
+    else return false
+  }
+
 }
 
 let c = new Controller()
@@ -104,7 +126,4 @@ function sendMessage(message) {
   connection.send(JSON.stringify(message))
 }
 
-function isGameWon(message) {
-  if (message.winner === model.getPlayerId()) return true
-  else return false
-}
+

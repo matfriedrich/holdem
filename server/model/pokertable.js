@@ -31,7 +31,7 @@ const options = {
   raise: "Raise",
   call: "Call/Check",
   fold: "Fold",
-  allin: "AllIn",
+  allin: "All In",
 }
 
 const Player = require("./player")
@@ -56,15 +56,13 @@ class PokerTable {
     this.result
     this.currentHighestBet
     this.winningHand = ""
+    this.playersToRemove = []
     this.shuffleDeck()
   }
 
-  addPlayer(ws) {
+  addPlayer(ws, username) {
     var status = "fail"
-    var newPlayer = new Player(0, 1000, actions.noaction)
-
-    var existingPlayers = []
-    this.players.forEach((element) => existingPlayers.push(element.id))
+    var newPlayer = new Player(0, 1000, actions.noaction, username)
 
     if (this.players.length < 4) {
       newPlayer.setId(this.players.length)
@@ -77,7 +75,7 @@ class PokerTable {
       type: "join",
       status: status,
       player: newPlayer,
-      existingplayers: existingPlayers,
+      existingplayers: this.players,
     }
 
     return message
@@ -167,6 +165,18 @@ class PokerTable {
     var playersleft = []
 
     for (i = 0; i < this.players.length; i++) {
+      if (this.players[i].getIsActive() || this.players[i].getIsAllin()) {
+        playersleft.push(this.players[i])
+      }
+    }
+    return playersleft
+  }
+
+  playersLeftWithAction() {
+    var i = 0
+    var playersleft = []
+
+    for (i = 0; i < this.players.length; i++) {
       if (this.players[i].getIsActive()) {
         playersleft.push(this.players[i])
       }
@@ -181,8 +191,10 @@ class PokerTable {
       this.players[i].resetBet()
       this.players[i].setPrevaction(actions.noaction)
       this.players[i].setIsActive(true)
+      this.players[i].setIsAllin(false)
     }
 
+    this.playersToRemove = []
     this.state = states.preflop
     this.pot = 0
     this.shuffleDeck()
@@ -251,13 +263,25 @@ class PokerTable {
     return true
   }
 
+  checkEveryoneIsAllin() {
+    console.log("checking if everyone is all in")
+    var i
+    for (i = 0; i < this.players.length; i++) {
+      if (!this.players[i].getIsAllin()) {
+        console.log("not everyone is all in")
+        return false
+      }
+    }
+    return true
+  }
+
   processAction(msg) {
     if (msg.player !== this.activePlayer) {
       console.log("Action not from active player - something is wrong")
       return "fail"
     }
 
-    this.lastAction = "Player " + this.activePlayer + " " + msg.action
+    this.lastAction = "Player " + msg.player + " " + msg.action
 
     switch (msg.action) {
       case options.raise:
@@ -287,42 +311,59 @@ class PokerTable {
           this.activePlayer = this.dealer
         }
         this.incrementActivePlayer()
-        if (this.state == states.result) {
+        if (this.playersLeftWithAction().length === 0 || this.state == states.result) {
           var winners = this.determineWinner()
           this.resolveRound(winners)
         }
         break
       case options.allin:
-        this.players[msg.player].setPrevaction(actions.all)
-        this.setNextPlayersOptions()
+        this.players[msg.player].setPrevaction(actions.allin)
+        this.players[msg.player].setIsActive(false)
+        this.players[msg.player].setIsAllin(true)
+        
         this.placeBet(
           this.players[msg.player],
           this.players[msg.player].getBalance()
         )
+
         if (this.players[msg.player].getBet() > this.currentHighestBet) {
           this.currentHighestBet = this.players[msg.player].getBet()
         }
+
+        if(this.playersLeftWithAction().length >= 1) this.setNextPlayersOptions()
+
         if (this.checkEveryoneMadeTurn() && this.checkAllBetsAreSame()) {
           this.state++
           this.resetPlayerForTurn()
           this.activePlayer = this.dealer
         }
-        this.incrementActivePlayer()
-        if (this.state == states.result) {
+        if(this.playersLeftWithAction().length >= 1) this.incrementActivePlayer()
+        if (this.checkEveryoneIsAllin() || this.state == states.result) {
           var winners = this.determineWinner()
           this.resolveRound(winners)
         }
         break
       case options.fold:
         this.players[msg.player].setIsActive(false)
-        this.setNextPlayersOptions()
+        if(this.playersLeftWithAction().length >= 1) this.setNextPlayersOptions()
+
         var playersleft = this.playersLeft()
+        console.log('Players left ' + playersleft.length)
+        console.log('players left with action ' + this.playersLeftWithAction().length)
         if (playersleft.length === 1) {
           this.resolveRound(playersleft)
           break
         }
+        else if (this.playersLeftWithAction().length === 0) {
+          var winners = this.determineWinner()
+          this.resolveRound(winners)
+          break
+        }
+          
         this.incrementActivePlayer()
         break
+      default:
+        return;   
     }
   }
 
@@ -358,6 +399,7 @@ class PokerTable {
     var i = this.players.length
     while (i--) {
       if (this.players[i].getBalance() === 0) {
+        this.playersToRemove.push(i)
         this.players.splice(i, 1)
       }
     }
@@ -381,6 +423,11 @@ class PokerTable {
         turn = this.turn
         river = this.river
         break
+      case states.result:
+        flop = this.flop
+        turn = this.turn
+        river = this.river
+        break
     }
 
     var message = {
@@ -396,6 +443,7 @@ class PokerTable {
       options: this.options,
       lastaction: this.lastAction,
       result: this.result,
+      playerToRemove: this.playersToRemove,
     }
 
     return message
@@ -412,7 +460,7 @@ class PokerTable {
     var converted_river = this.convertCard(this.river)
 
     for (var i = 0; i < this.players.length; i++) {
-      if (this.players[i].getIsActive()) {
+      if (this.players[i].getIsActive() || this.players[i].getIsAllin()) {
         var converted_card0 = this.convertCard(this.players[i].getCard0())
         var converted_card1 = this.convertCard(this.players[i].getCard1())
         var hand = []

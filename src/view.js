@@ -5,6 +5,8 @@ class View {
     this.title = this.createElement('h1');
     this.title.textContent = 'Texas Holdem';
 
+    this.form = this.createElement('form');
+
     this.main = this.createElement('div');
     this.main.className = 'flex-container';
     this.tableTitle = this.createElement('h2');
@@ -13,14 +15,31 @@ class View {
     this.canvas = this.createElement('div');
     this.canvas.id = 'canvas';
     this.options = this.createElement('div');
-    this.options.id = 'options'
+    this.options.id = 'options';
+    this.allin = this.createElement('div');
+    this.allin.id = 'allinDrop';
+    
+    this.allin.addEventListener('dragover', event => {
 
-    this.joinButton = this.createElement('Button');
+      this.handleDragover(event);
+    });
+
+    this.input = this.createElement('input');
+    this.input.type = 'text';
+    this.input.placeholder = 'Guest';
+    this.input.id = 'usernameinput'
+    this.input.pattern = "[A-Za-z0-9]+";
+    this.input.required = true;
+    this.input.title="Username should only contain letters and numbers. e.g. John123";
+
+    this.joinButton = this.createElement('input');
     this.joinButton.id = 'joinButton';
-    this.joinButton.textContent = 'Join Game';
+    this.joinButton.type = 'submit'
+    this.joinButton.value = 'Join Game'
 
-    this.main.append(this.joinButton);
-    this.app.append(this.title, this.main);
+    this.form.append(this.input);
+    this.form.append(this.joinButton);
+    this.app.append(this.title, this.form, this.main);
 
   }
 
@@ -48,10 +67,10 @@ class View {
   }
 
   bindJoin(handler){
-    this.joinButton.addEventListener('click', event => {
+    this.form.addEventListener('submit', event => {
       event.preventDefault();
 
-      handler();
+      handler(this.input.value);
     })
   }
 
@@ -62,9 +81,43 @@ class View {
     })
   }
 
+  bindDrop(handler){
+    this.allin.addEventListener('drop', event => {
+      if (event.preventDefault) {
+        event.preventDefault();
+      }
+      handler(event);
+    });
+  }
+
+
   displayTable(pokertable) {
     // Todo: Canvas stuff 
-    this.main.append(this.tableTitle, this.canvas, this.options);
+    this.main.append(this.tableTitle, this.canvas, this.allin, this.options);
+  }
+
+  createAllinImg() {
+    var allin = this.createElement('img');
+    allin.id = 'allin';
+    allin.src = 'chips.jpg';
+    allin.draggable = 'true';
+    
+    allin.addEventListener('dragstart', event => {
+
+      this.handleDragStart(event);
+    });
+
+    return allin;
+  }
+
+  handleDragStart(ev) {
+    ev.dataTransfer.setData('text', ev.target.id);
+  }
+
+  handleDragover(ev) {
+    if (ev.preventDefault) {
+      ev.preventDefault();
+    }
   }
 
   updateTable(pokertable) {
@@ -76,6 +129,9 @@ class View {
     }
     while(this.options.firstChild) {
       this.options.removeChild(this.options.firstChild);
+    }
+    while(this.allin.firstChild) {
+      this.allin.removeChild(this.allin.firstChild);
     }
 
     var pot = this.createElement('p');
@@ -97,7 +153,7 @@ class View {
 
     for(i = 0; i < pokertable.players.length; i++) {
       players.push(this.createElement('p'));
-      players[i].textContent = 'Player ' + pokertable.players[i].id.toString() + ' Balance: ' + 
+      players[i].textContent = pokertable.players[i].username.toString() + ' Balance: ' + 
       pokertable.players[i].balance.toString() + ' Card0: ' + pokertable.players[i].card0.value +
         ' ' + pokertable.players[i].card0.suit + ' Card1: ' + pokertable.players[i].card1.value +
         ' ' + pokertable.players[i].card1.suit + ' Bet: ' + pokertable.players[i].bet;
@@ -117,6 +173,10 @@ class View {
 
     if(pokertable.isActivePlayer) {
       for(j = 0; j < pokertable.options.length; j++) {
+        if(pokertable.options[j] == "All In") {
+          this.options.append(this.createAllinImg());
+          continue;
+        }
         var button = this.createElement('button');
         button.textContent = pokertable.options[j];
         this.options.append(button);
@@ -124,6 +184,7 @@ class View {
     }
   }
 }
+
 
 
 /*<button onclick="c.joinGame()">Join Table</button>

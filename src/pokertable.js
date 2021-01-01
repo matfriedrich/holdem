@@ -14,8 +14,8 @@ class PokerTable {
     this.result
   }
 
-  addPlayer(player) {
-    this.players.push(player)
+  setPlayers(players) {
+    this.players = players;
   }
 
   updatePokertable(msg) {
@@ -27,19 +27,11 @@ class PokerTable {
       this.isActivePlayer = true;
     }
 
-    var i;
-    for(i = 0; i < this.players.length; i++) {
-      if(this.players[i].id == msg.players[i].id) {
-        this.players[i] = msg.players[i];
-        /*this.players[i].setBalance(msg.players[i].balance);
-        this.players[i].setCard0(msg.players[i].card0);
-        this.players[i].setCard1(msg.players[i].card1);
-        this.players[i].setBet(msg.players[i].bet);*/
-        continue;
-      }
+    msg.playerToRemove.forEach(element => {
+      this.players.splice(element, 1)
+    });
 
-      console.log('Ids dont match up, something is wrong');
-    }
+    this.players = msg.players;
 
     this.flop = msg.flop;
     this.turn = msg.turn;

@@ -3,7 +3,7 @@ var node_static = require("node-static")
 const WebSocket = require("ws")
 const Client = require("./model/Client")
 const PokerTable = require("./model/pokertable")
-const pokerTable = new PokerTable()
+pokerTable = new PokerTable()
 
 const hostname = "127.0.0.1"
 const webserverPort = process.env.PORT || 8088
@@ -56,7 +56,7 @@ function handleMessage(ws, message) {
   switch (msg.type) {
     case "join":
       //console.log('Received join from client');
-      var payload = pokerTable.addPlayer(ws)
+      var payload = pokerTable.addPlayer(ws, msg.name)
       ws.send(JSON.stringify(payload))
 
       if (payload.status === "success") {
@@ -75,7 +75,7 @@ function handleMessage(ws, message) {
           pokerTable.connections.forEach(function each(player) {
             player.send(JSON.stringify(payload))
           })
-        }, 2000)
+        }, 1000)
       }
 
       break
@@ -86,7 +86,7 @@ function handleMessage(ws, message) {
         player.send(JSON.stringify(payload))
       })
 
-      if (pokerTable.state === 5) {
+      if (pokerTable.state === 5 && pokerTable.players.length > 1) {
         setTimeout(function () {
           pokerTable.startRound(msg)
           var payload = pokerTable.packTableAsMessage(msg)
@@ -104,6 +104,7 @@ function handleMessage(ws, message) {
         pokerTable.connections.forEach(function each(player) {
           player.send(JSON.stringify(message))
         })
+        pokerTable = new PokerTable;
       }
       break
   }

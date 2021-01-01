@@ -10,8 +10,8 @@ class Model {
     this.onPokertableChanged = callback
   }
 
-  addPlayer(player) {
-    this.pokertable.addPlayer(player)
+  setPlayers(players) {
+    this.pokertable.setPlayers(players)
   }
 
   updatePokertable(message) {
