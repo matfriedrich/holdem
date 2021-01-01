@@ -4,6 +4,7 @@ class Controller {
     this.view = new View()
 
     this.view.bindJoin(this.sendJoin)
+    this.view.bindStatistics(this.showStatistics)
     this.view.bindAction(this.sendAction)
     this.view.bindDrop(this.sendAllin)
     this.model.bindPokertableChanged(this.onPokertableChanged)
@@ -36,6 +37,17 @@ class Controller {
     sendMessage(message)
   }
 
+  showStatistics = () => {
+    var statistics = this.model.retrieveResults()
+    var losses = statistics[0] - statistics[1]
+    var winrate = Math.round(statistics[1] / statistics[0] * 100)
+
+    alert('Total Games played: ' + statistics[0] + '\n' 
+          + 'Games Won: ' + statistics[1] + '\n' 
+          + 'Games Lost: ' + losses + '\n' 
+          + 'Win rate: ' + winrate + '%')
+  }
+
   handleJoin(msg) {
     if (msg.status === "fail") {
       alert("Table is already full!")
@@ -47,8 +59,7 @@ class Controller {
     this.model.setPlayers(msg.existingplayers)
     console.log("Player " + msg.player.username + " has joined")
 
-    this.view.removeElement("joinButton")
-    this.view.removeElement("usernameinput")
+
     this.view.displayTable(this.model.pokertable)
   }
 

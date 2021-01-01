@@ -37,8 +37,12 @@ class View {
     this.joinButton.type = 'submit'
     this.joinButton.value = 'Join Game'
 
-    this.form.append(this.input);
-    this.form.append(this.joinButton);
+    this.statisticsButton = this.createElement('button');
+    this.statisticsButton.id = 'statisticsButton';
+    this.statisticsButton.textContent = 'Statistics'
+
+    this.form.append(this.input, this.joinButton, this.statisticsButton);
+
     this.app.append(this.title, this.form, this.main);
 
   }
@@ -74,6 +78,14 @@ class View {
     })
   }
 
+  bindStatistics(handler){
+    this.statisticsButton.addEventListener('click', event => {
+      event.preventDefault();
+
+      handler();
+    })
+  }
+
   bindAction(handler){
     this.options.addEventListener('click', event => {
 
@@ -88,12 +100,6 @@ class View {
       }
       handler(event);
     });
-  }
-
-
-  displayTable(pokertable) {
-    // Todo: Canvas stuff 
-    this.main.append(this.tableTitle, this.canvas, this.allin, this.options);
   }
 
   createAllinImg() {
@@ -118,6 +124,14 @@ class View {
     if (ev.preventDefault) {
       ev.preventDefault();
     }
+  }
+
+  displayTable(pokertable) {
+    // Todo: Canvas stuff 
+    this.removeElement("joinButton")
+    this.removeElement("usernameinput")
+    this.removeElement("statisticsButton")
+    this.main.append(this.tableTitle, this.canvas, this.allin, this.options);
   }
 
   updateTable(pokertable) {

@@ -32,6 +32,14 @@ class Model {
     console.log("WON:   " + localStorage.getItem(GAMES_WON))
   }
 
+  retrieveResults() {
+    var statistics = []
+    statistics.push(localStorage.getItem(GAMES_TOTAL))
+    statistics.push(localStorage.getItem(GAMES_WON))
+
+    return statistics;
+  }
+
   setPlayerId(id) {
     this.pokertable.setPlayerId(id)
   }
