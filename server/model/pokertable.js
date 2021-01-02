@@ -281,7 +281,7 @@ class PokerTable {
       return "fail"
     }
 
-    this.lastAction = "Player " + msg.player + " " + msg.action
+    this.lastAction = this.players[msg.player].getUsername() + " " + msg.action
 
     switch (msg.action) {
       case options.raise:
@@ -311,7 +311,10 @@ class PokerTable {
           this.activePlayer = this.dealer
         }
         this.incrementActivePlayer()
-        if (this.playersLeftWithAction().length === 0 || this.state == states.result) {
+        if (
+          this.playersLeftWithAction().length === 0 ||
+          this.state == states.result
+        ) {
           var winners = this.determineWinner()
           this.resolveRound(winners)
         }
@@ -320,7 +323,7 @@ class PokerTable {
         this.players[msg.player].setPrevaction(actions.allin)
         this.players[msg.player].setIsActive(false)
         this.players[msg.player].setIsAllin(true)
-        
+
         this.placeBet(
           this.players[msg.player],
           this.players[msg.player].getBalance()
@@ -330,14 +333,16 @@ class PokerTable {
           this.currentHighestBet = this.players[msg.player].getBet()
         }
 
-        if(this.playersLeftWithAction().length >= 1) this.setNextPlayersOptions()
+        if (this.playersLeftWithAction().length >= 1)
+          this.setNextPlayersOptions()
 
         if (this.checkEveryoneMadeTurn() && this.checkAllBetsAreSame()) {
           this.state++
           this.resetPlayerForTurn()
           this.activePlayer = this.dealer
         }
-        if(this.playersLeftWithAction().length >= 1) this.incrementActivePlayer()
+        if (this.playersLeftWithAction().length >= 1)
+          this.incrementActivePlayer()
         if (this.checkEveryoneIsAllin() || this.state == states.result) {
           var winners = this.determineWinner()
           this.resolveRound(winners)
@@ -345,25 +350,27 @@ class PokerTable {
         break
       case options.fold:
         this.players[msg.player].setIsActive(false)
-        if(this.playersLeftWithAction().length >= 1) this.setNextPlayersOptions()
+        if (this.playersLeftWithAction().length >= 1)
+          this.setNextPlayersOptions()
 
         var playersleft = this.playersLeft()
-        console.log('Players left ' + playersleft.length)
-        console.log('players left with action ' + this.playersLeftWithAction().length)
+        console.log("Players left " + playersleft.length)
+        console.log(
+          "players left with action " + this.playersLeftWithAction().length
+        )
         if (playersleft.length === 1) {
           this.resolveRound(playersleft)
           break
-        }
-        else if (this.playersLeftWithAction().length === 0) {
+        } else if (this.playersLeftWithAction().length === 0) {
           var winners = this.determineWinner()
           this.resolveRound(winners)
           break
         }
-          
+
         this.incrementActivePlayer()
         break
       default:
-        return;   
+        return
     }
   }
 
@@ -398,7 +405,7 @@ class PokerTable {
   removePlayersWithoutBalance() {
     var i = this.players.length
     while (i--) {
-      if (this.players[i].getBalance() === 0) {
+      if (this.players[i].getBalance() <= 0) {
         this.playersToRemove.push(i)
         this.players.splice(i, 1)
       }

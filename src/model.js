@@ -34,10 +34,15 @@ class Model {
 
   retrieveResults() {
     var statistics = []
-    statistics.push(localStorage.getItem(GAMES_TOTAL))
-    statistics.push(localStorage.getItem(GAMES_WON))
+    var gamesTotal = localStorage.getItem(GAMES_TOTAL)
+    if (!gamesTotal) gamesTotal = 0
+    var gamesWon = localStorage.getItem(GAMES_WON)
+    if (!gamesWon) gamesWon = 0
 
-    return statistics;
+    statistics.push(gamesTotal)
+    statistics.push(gamesWon)
+
+    return statistics
   }
 
   setPlayerId(id) {

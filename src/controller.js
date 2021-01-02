@@ -11,7 +11,7 @@ class Controller {
   }
 
   sendJoin = (username) => {
-    const message = { type: "join" , name: username}
+    const message = { type: "join", name: username }
     sendMessage(message)
   }
 
@@ -25,14 +25,14 @@ class Controller {
   }
 
   sendAllin = (ev) => {
-    var data = ev.dataTransfer.getData("text");
-    console.log('data ' + data);
-    ev.target.appendChild(document.getElementById(data));
+    var data = ev.dataTransfer.getData("text")
+    console.log("data " + data)
+    ev.target.appendChild(document.getElementById(data))
 
     const message = {
       type: "action",
       player: this.model.getPlayerId(),
-      action: 'All In',
+      action: "All In",
     }
     sendMessage(message)
   }
@@ -40,12 +40,24 @@ class Controller {
   showStatistics = () => {
     var statistics = this.model.retrieveResults()
     var losses = statistics[0] - statistics[1]
-    var winrate = Math.round(statistics[1] / statistics[0] * 100)
+    var winrate = 0
+    if (statistics[0] != 0)
+      winrate = Math.round((statistics[1] / statistics[0]) * 100)
 
-    alert('Total Games played: ' + statistics[0] + '\n' 
-          + 'Games Won: ' + statistics[1] + '\n' 
-          + 'Games Lost: ' + losses + '\n' 
-          + 'Win rate: ' + winrate + '%')
+    alert(
+      "Total Games played: " +
+        statistics[0] +
+        "\n" +
+        "Games Won: " +
+        statistics[1] +
+        "\n" +
+        "Games Lost: " +
+        losses +
+        "\n" +
+        "Win rate: " +
+        winrate +
+        "%"
+    )
   }
 
   handleJoin(msg) {
@@ -54,11 +66,9 @@ class Controller {
       return
     }
 
-
     this.model.setPlayerId(msg.player.id)
     this.model.setPlayers(msg.existingplayers)
     console.log("Player " + msg.player.username + " has joined")
-
 
     this.view.displayTable(this.model.pokertable)
   }
@@ -73,13 +83,12 @@ class Controller {
   }
 
   handleResult(msg) {
-    
     if (this.isGameWon(msg)) {
       this.model.storeResult(true)
-      alert('You won the game! Congratulations')
+      alert("You won the game! Congratulations")
     } else {
       this.model.storeResult(false)
-      alert('Player ' + msg.winner + ' has won')
+      alert("Player " + msg.winner + " has won")
     }
     location.reload()
   }
@@ -92,7 +101,6 @@ class Controller {
     if (message.winner === this.model.getPlayerId()) return true
     else return false
   }
-
 }
 
 let c = new Controller()
@@ -136,5 +144,3 @@ connection.onmessage = function (e) {
 function sendMessage(message) {
   connection.send(JSON.stringify(message))
 }
-
-
