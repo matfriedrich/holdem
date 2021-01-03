@@ -4,16 +4,19 @@ class View {
     
     this.title = this.createElement('h1');
     this.title.textContent = 'Texas Holdem';
+    this.title.classList.add("text-center");
 
     this.form = this.createElement('form');
+    this.form.classList.add("text-center");
 
     this.main = this.createElement('div');
     this.main.className = 'flex-container';
-    this.tableTitle = this.createElement('h2');
-    this.tableTitle.textContent = 'Table';
 
     this.canvas = this.createElement('div');
     this.canvas.id = 'canvas';
+    this.svgBox = this.createElement('div');
+    this.svgBox.id = 'svgBox';
+    this.svg = new Svg(this.svgBox);
     this.options = this.createElement('div');
     this.options.id = 'options';
     this.allin = this.createElement('div');
@@ -26,6 +29,7 @@ class View {
 
     this.input = this.createElement('input');
     this.input.type = 'text';
+    this.input.setAttribute('autofocus', true);
     this.input.placeholder = 'Guest';
     this.input.id = 'usernameinput'
     this.input.pattern = "[A-Za-z0-9]+";
@@ -34,11 +38,13 @@ class View {
 
     this.joinButton = this.createElement('input');
     this.joinButton.id = 'joinButton';
+    this.joinButton.classList.add("btn");
     this.joinButton.type = 'submit'
     this.joinButton.value = 'Join Game'
 
     this.statisticsButton = this.createElement('button');
     this.statisticsButton.id = 'statisticsButton';
+    this.statisticsButton.classList.add("btn");
     this.statisticsButton.textContent = 'Statistics'
 
     this.form.append(this.input, this.joinButton, this.statisticsButton);
@@ -127,15 +133,22 @@ class View {
   }
 
   displayTable(pokertable) {
+    console.log("View. displayTable()");
+
     // Todo: Canvas stuff 
     this.removeElement("joinButton")
     this.removeElement("usernameinput")
     this.removeElement("statisticsButton")
-    this.main.append(this.tableTitle, this.canvas, this.allin, this.options);
+    this.main.append(this.canvas, this.svgBox, this.allin, this.options);
+
+    this.svg.drawTable(pokertable);
   }
 
   updateTable(pokertable) {
+    console.log("View. updateTable()");
+    
     // Todo: Canvas stuff 
+    this.svg.drawTable(pokertable);
 
     
     while(this.canvas.firstChild) {
