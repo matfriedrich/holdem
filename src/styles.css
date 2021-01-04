@@ -68,8 +68,8 @@ button, .btn {
 
 svg text.text-white,
 svg .fill-white {
-  color: #fff;
-  fill: #fff;
+  color: #fdf9ea;
+  fill: #fdf9ea;
 }
 
 svg .fill-red {
@@ -94,11 +94,17 @@ svg text {
 
 rect.card {
   fill: #9f3f2c;
-  stroke:#f4eed7;
+  stroke:#fdf9ea;
   stroke-width: .4%;
 }
 
-circle.pulse { fill: white; animation: pulse 2s alternate infinite; }
+rect.card-front {
+  fill: #fdf9ea;
+  stroke:#9f3f2c;
+  stroke-width: .4%;
+}
+
+circle.pulse { fill: #fdf9ea; animation: pulse 2s alternate infinite; }
 @keyframes pulse {
   100% {
     r: 1.25;
