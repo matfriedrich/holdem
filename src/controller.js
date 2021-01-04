@@ -11,6 +11,7 @@ class Controller {
     this.view.bindAction(this.sendAction)
     this.view.bindDrop(this.sendAllin)
     this.model.bindPokertableChanged(this.onPokertableChanged)
+    this.model.bindPlayersChanged(this.onPlayersChanged)
   }
 
   /**
@@ -108,6 +109,10 @@ class Controller {
 
   onPokertableChanged = (pokertable) => {
     this.view.updateTable(pokertable)
+  }
+
+  onPlayersChanged = (pokertable) => {
+    this.view.updatePlayers(pokertable)
   }
 
   isGameWon(message) {

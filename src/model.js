@@ -10,8 +10,14 @@ class Model {
     this.onPokertableChanged = callback
   }
 
+  bindPlayersChanged(callback) {
+    this.onPlayersChanged = callback
+  }
+
   setPlayers(players) {
     this.pokertable.setPlayers(players)
+
+    this.onPlayersChanged(this.pokertable) //notify view
   }
 
   updatePokertable(message) {

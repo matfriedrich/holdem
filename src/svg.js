@@ -174,7 +174,6 @@ class SelfPlayer extends SvgPlayer {
 
             //SUIT
             var suit = null;
-            console.log(cardObject);
             switch(cardObject.suit) {
                 case 'c':   suit = SvgSuit.getSvg(SvgSuit.clubs);
                             break;
@@ -212,6 +211,49 @@ class Svg {
       this.svg.setAttribute("viewBox", "0 0 100 50"); 
 
       parent.append(this.svg);
+
+      //define Player Positions
+      this.playerTopGroup = document.createElementNS(xmlns, "g");
+      this.playerTopGroup.id = "playerTop";
+      this.playerTopGroup.setAttributeNS(null, 'transform', 'translate(50 5)');
+
+      this.playerLeftGroup = document.createElementNS(xmlns, "g");
+      this.playerLeftGroup.id = "playerLeft";
+      this.playerLeftGroup.setAttributeNS(null, 'transform', 'translate(10 15)');
+
+      this.playerRightGroup = document.createElementNS(xmlns, "g");
+      this.playerRightGroup.id = "playerRight";
+      this.playerRightGroup.setAttributeNS(null, 'transform', 'translate(90 15)');
+
+      this.playerSelfGroup = document.createElementNS(xmlns, "g");
+      this.playerSelfGroup.id = "playerSelf";
+      this.playerSelfGroup.setAttributeNS(null, 'transform', 'translate(50 40)');
+
+      this.svg.append(this.playerTopGroup, this.playerLeftGroup, this.playerRightGroup, this.playerSelfGroup);
+
+      //define Pot Position
+      this.potGroup = document.createElementNS(xmlns, "g");
+      this.svg.append(this.potGroup);
+      this.potGroup.id = "potGroup";
+      this.potGroup.setAttributeNS(null, 'transform', 'translate(20 30)');
+
+      this.potTitle = document.createElementNS(xmlns, "text");
+      var potTitleContent = document.createTextNode( "Pot" );
+      this.potTitle.setAttributeNS(null, 'class', 'fill-white');
+      this.potTitle.appendChild(potTitleContent);
+      this.potGroup.appendChild(this.potTitle);
+
+      this.potAmount = document.createElementNS(xmlns, "text");
+      this.potAmountContent = document.createTextNode( "$ 0" );
+      this.potAmount.setAttributeNS(null, 'class', 'fill-white');
+      this.potAmount.appendChild(this.potAmountContent);
+      this.potGroup.appendChild(this.potAmount);
+
+      this.potDivider = document.createElementNS(xmlns, "rect");
+      this.potDivider.setAttributeNS(null, 'transform', 'translate(0 .7)');
+      this.potDivider.setAttributeNS(null, 'height', .2);
+      this.potDivider.setAttributeNS(null, 'class', 'fill-white');
+      this.potGroup.appendChild(this.potDivider);
     }
 
     createCircle(cx = 0, cy = 0, r = 1) {
@@ -244,31 +286,29 @@ class Svg {
 
     }
 
-    drawTable(pokertable) {
-        console.log("SVG: drawTable()");
-        console.log("pokertable: ", pokertable)
-
-        while(this.svg.firstChild) {    //reset SVG Area
-            this.svg.removeChild(this.svg.firstChild);
+    resetTable() {
+        while(this.playerLeftGroup.firstChild) {    //reset SVG Area
+            this.playerLeftGroup.removeChild(this.playerLeftGroup.firstChild);
         }
 
-        this.playerTopGroup = document.createElementNS(xmlns, "g");
-        this.playerTopGroup.id = "playerTop";
-        this.playerTopGroup.setAttributeNS(null, 'transform', 'translate(50 5)');
+        while(this.playerRightGroup.firstChild) {    //reset SVG Area
+            this.playerRightGroup.removeChild(this.playerRightGroup.firstChild);
+        }
 
-        this.playerLeftGroup = document.createElementNS(xmlns, "g");
-        this.playerLeftGroup.id = "playerLeft";
-        this.playerLeftGroup.setAttributeNS(null, 'transform', 'translate(10 25)');
+        while(this.playerTopGroup.firstChild) {    //reset SVG Area
+            this.playerTopGroup.removeChild(this.playerTopGroup.firstChild);
+        }
 
-        this.playerRightGroup = document.createElementNS(xmlns, "g");
-        this.playerRightGroup.id = "playerRight";
-        this.playerRightGroup.setAttributeNS(null, 'transform', 'translate(90 25)');
+        while(this.playerSelfGroup.firstChild) {    //reset SVG Area
+            this.playerSelfGroup.removeChild(this.playerSelfGroup.firstChild);
+        }
+    }
 
-        this.playerSelfGroup = document.createElementNS(xmlns, "g");
-        this.playerSelfGroup.id = "playerSelf";
-        this.playerSelfGroup.setAttributeNS(null, 'transform', 'translate(50 40)');
+    drawTable(pokertable) {
+        console.log("SVG.drawTable()");
+        console.log("pokertable: ", pokertable)
 
-        this.svg.append(this.playerTopGroup, this.playerLeftGroup, this.playerRightGroup, this.playerSelfGroup);
+        this.resetTable();
 
         var ownPlayerID = pokertable.playerId;
         var players = [];   //just to be sure that array index correlates to player's id
@@ -325,37 +365,22 @@ class Svg {
 
 
 
-        //POT
-        this.potGroup = document.createElementNS(xmlns, "g");
-        this.svg.append(this.potGroup);
-        this.potGroup.id = "potGroup";
-        this.potGroup.setAttributeNS(null, 'transform', 'translate(30 30)');
+        this.updatePot(pokertable.pot);
 
-        var potTitle = document.createElementNS(xmlns, "text");
-        var potTitleContent = document.createTextNode( "Pot" );
-        potTitle.setAttributeNS(null, 'class', 'fill-white');
-        potTitle.appendChild(potTitleContent);
-        this.potGroup.appendChild(potTitle);
 
-        var potTitleBBox = potTitle.getBBox();
+    }
+
+    updatePot(potValue) {
+        this.potAmountContent.nodeValue = "$ " + potValue;
+    }
+
+    setPotTranslations() {  //this is called in view.displayTable() after svg has been appended, so that BBox can be calculated
+        console.log("Svg.setPotTranslations()")
+        var potTitleBBox = this.potTitle.getBBox();
         var potTitleWidth = potTitleBBox.width, potTitleHeight = potTitleBBox.height;
+        this.potAmount.setAttributeNS(null, 'transform', 'translate(0 '+ potTitleHeight * 1.5 +')');
 
-        var potAmount = document.createElementNS(xmlns, "text");
-        var potAmountContent = document.createTextNode( "$ " + pokertable.pot );
-        potAmount.setAttributeNS(null, 'class', 'fill-white');
-        potAmount.setAttributeNS(null, 'transform', 'translate(0 '+ potTitleHeight * 1.5 +')');
-        potAmount.appendChild(potAmountContent);
-        this.potGroup.appendChild(potAmount);
-
-        var potDivider = document.createElementNS(xmlns, "rect");
-        potDivider.setAttributeNS(null, 'transform', 'translate(0 .7)');
-        potDivider.setAttributeNS(null, 'height', .2);
-        potDivider.setAttributeNS(null, 'width', potTitleWidth +2);
-        potDivider.setAttributeNS(null, 'class', 'fill-white');
-        this.potGroup.appendChild(potDivider);
-
-
-
+        this.potDivider.setAttributeNS(null, 'width', potTitleWidth +2);
     }
 
 

@@ -141,6 +141,14 @@ class View {
     this.removeElement("statisticsButton")
     this.main.append(this.canvas, this.svgBox, this.allin, this.options);
 
+    this.svg.setPotTranslations() //called after appending this.svgBox so that the translations can be calculated
+
+    this.svg.drawTable(pokertable);
+  }
+
+  updatePlayers(pokertable) {
+    console.log("View.updatePlayers()")
+
     this.svg.drawTable(pokertable);
   }
 
