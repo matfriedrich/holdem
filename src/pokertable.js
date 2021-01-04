@@ -14,10 +14,18 @@ class PokerTable {
     this.result
   }
 
+  /**
+   * Update the players 
+   * @param {*} players Array of player objects
+   */
   setPlayers(players) {
     this.players = players;
   }
 
+  /**
+   * Update the pokertable 
+   * @param {*} msg message of type "tablestatus"
+   */
   updatePokertable(msg) {
     
     this.pot = msg.pot;
@@ -42,10 +50,17 @@ class PokerTable {
     this.result = msg.result;
   }
 
+  /**
+   * Set id of the player
+   * @param {*} id Id of the player 
+   */
   setPlayerId(id) {
     this.playerId = id;
   }
 
+  /**
+   * Returns playerId 
+   */
   getPlayerId() {
     return this.playerId;
   }

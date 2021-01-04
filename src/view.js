@@ -53,6 +53,11 @@ class View {
 
   }
 
+  /**
+   * Create an element with an optional CSS class
+   * @param {*} tag Type of element to create 
+   * @param {*} className Name of CSS class
+   */
   createElement(tag, className) {
     const element = document.createElement(tag);
     if(className) {
@@ -62,12 +67,20 @@ class View {
     return element;
   }
 
+  /**
+   * Retrive an element from the DOM 
+   * @param {*} selector Identifier of the element
+   */
   getElement(selector) {
     const element = document.querySelector(selector);
 
     return element;
   }
 
+  /**
+   * Delete an element from the DOM
+   * @param {*} id Identifier of the element
+   */
   removeElement(id) {
     var element = document.getElementById(id);
     if(element !== null) {
@@ -76,6 +89,10 @@ class View {
     
   }
 
+  /**
+   * Bind join button eventlistener to handler function from the controller
+   * @param {*} handler Handler function of the controller
+   */
   bindJoin(handler){
     this.form.addEventListener('submit', event => {
       event.preventDefault();
@@ -84,6 +101,10 @@ class View {
     })
   }
 
+  /**
+   * Bind statistics button eventlistener to handler function from the controller
+   * @param {*} handler Handler function of the controller
+   */
   bindStatistics(handler){
     this.statisticsButton.addEventListener('click', event => {
       event.preventDefault();
@@ -92,6 +113,10 @@ class View {
     })
   }
 
+  /**
+   * Bind action button eventlistener to handler function from the controller
+   * @param {*} handler Handler function of the controller
+   */
   bindAction(handler){
     this.options.addEventListener('click', event => {
 
@@ -99,6 +124,10 @@ class View {
     })
   }
 
+  /**
+   * Bind drag and drop eventlistener to handler function from the controller
+   * @param {*} handler Handler function of the controller
+   */
   bindDrop(handler){
     this.allin.addEventListener('drop', event => {
       if (event.preventDefault) {
@@ -108,6 +137,9 @@ class View {
     });
   }
 
+  /**
+   * Create the img element for the all in functionality
+   */
   createAllinImg() {
     var allin = this.createElement('img');
     allin.id = 'allin';
@@ -122,16 +154,28 @@ class View {
     return allin;
   }
 
+  /**
+   * Set behaviour when all in img gets dragged
+   * @param {*} ev Event
+   */
   handleDragStart(ev) {
     ev.dataTransfer.setData('text', ev.target.id);
   }
 
+  /**
+   * Set behaviour while all in img is being dragged
+   * @param {*} ev Event
+   */
   handleDragover(ev) {
     if (ev.preventDefault) {
       ev.preventDefault();
     }
   }
 
+  /**
+   * Display the table to clients
+   * @param {PokerTable} pokertable The pokertable to draw
+   */
   displayTable(pokertable) {
     console.log("View. displayTable()");
 
@@ -211,12 +255,3 @@ class View {
     }
   }
 }
-
-
-
-/*<button onclick="c.joinGame()">Join Table</button>
-    <div class="header"><h1>Texas Holdem Poker</h1></div>
-    <div class="flex-container">
-      <div id="canvas"><h2>canvas</h2></div>
-      <div id="bottom"><h2>bottom</h2></div>
-    </div>*/
