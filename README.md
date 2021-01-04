@@ -33,9 +33,9 @@ To add documentation for a function, add a block comment in the following style 
 ```
 [Further information: [JSDoc](https://jsdoc.app/), [CheatSheet](https://devhints.io/jsdoc)]
 
-Afterwards, generate the documentation of each file (e.g. controller.js) in the folder **"documentation"** using the command:
+Afterwards, generate the documentation for all files in **"src"** and store it in the folder **"documentation"** using the command:
 
-`jsdoc -d documentation controller.js`
+`jsdoc -d documentation .`
 
 The result is then available in **"index.html"** in the folder **"documentation"**.
 
