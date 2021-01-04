@@ -1,4 +1,7 @@
 class PokerTable {
+  /**
+   * Creates a new PokerTable Object
+   */
   constructor() {
     console.log("PokerTable")
     this.pot = 0
@@ -19,7 +22,7 @@ class PokerTable {
    * @param {*} players Array of player objects
    */
   setPlayers(players) {
-    this.players = players;
+    this.players = players
   }
 
   /**
@@ -27,27 +30,26 @@ class PokerTable {
    * @param {*} msg message of type "tablestatus"
    */
   updatePokertable(msg) {
-    
-    this.pot = msg.pot;
-    this.isActivePlayer = false;
+    this.pot = msg.pot
+    this.isActivePlayer = false
 
-    if(this.playerId == msg.activePlayer){
-      this.isActivePlayer = true;
+    if (this.playerId == msg.activePlayer) {
+      this.isActivePlayer = true
     }
 
-    msg.playerToRemove.forEach(element => {
+    msg.playerToRemove.forEach((element) => {
       this.players.splice(element, 1)
-    });
+    })
 
-    this.players = msg.players;
+    this.players = msg.players
 
-    this.flop = msg.flop;
-    this.turn = msg.turn;
-    this.river = msg.river;
+    this.flop = msg.flop
+    this.turn = msg.turn
+    this.river = msg.river
 
-    this.options = msg.options;
-    this.lastAction = msg.lastaction;
-    this.result = msg.result;
+    this.options = msg.options
+    this.lastAction = msg.lastaction
+    this.result = msg.result
   }
 
   /**
@@ -55,13 +57,13 @@ class PokerTable {
    * @param {*} id Id of the player 
    */
   setPlayerId(id) {
-    this.playerId = id;
+    this.playerId = id
   }
 
   /**
    * Returns playerId 
    */
   getPlayerId() {
-    return this.playerId;
+    return this.playerId
   }
 }

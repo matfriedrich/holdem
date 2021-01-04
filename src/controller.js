@@ -37,6 +37,10 @@ class Controller {
     sendMessage(message)
   }
 
+  /**
+   * Send all in message
+   * @param {Event} ev - event of AllIn Drop
+   */
   sendAllin = (ev) => {
     var data = ev.dataTransfer.getData("text")
     console.log("data " + data)
@@ -50,6 +54,9 @@ class Controller {
     sendMessage(message)
   }
 
+  /**
+   * Show game statistics in an alert message
+   */
   showStatistics = () => {
     var statistics = this.model.retrieveResults()
     var losses = statistics[0] - statistics[1]
@@ -73,6 +80,10 @@ class Controller {
     )
   }
 
+  /**
+   * Handle "join" message from server
+   * @param {*} msg - message of type "join" from server
+   */
   handleJoin(msg) {
     if (msg.status === "fail") {
       alert("Table is already full!")
@@ -86,15 +97,27 @@ class Controller {
     this.view.displayTable(this.model.pokertable)
   }
 
+  /**
+   * Handle "otherJoin" message from server
+   * @param {*} msg - message of type "otherJoin"
+   */
   handleOtherPlayerJoin(msg) {
     this.model.setPlayers(msg.existingplayers)
     console.log("Player " + msg.player.username + " has joined")
   }
 
+  /**
+   * Handle "tablestatus" message from server
+   * @param {*} msg - message of type "tablestatus"
+   */
   handleRound(msg) {
     this.model.updatePokertable(msg)
   }
 
+  /**
+   * Handle "game_result" message from server
+   * @param {*} msg - message of type "game_result"
+   */
   handleResult(msg) {
     if (this.isGameWon(msg)) {
       this.model.storeResult(true)
@@ -106,10 +129,19 @@ class Controller {
     location.reload()
   }
 
+  /**
+   * Update pokertable if something changed
+   * @param {PokerTable} pokertable - pokertable to update
+   */
   onPokertableChanged = (pokertable) => {
     this.view.updateTable(pokertable)
   }
 
+  /**
+   * Checks if player is the winner by looking at the result message
+   * @param {*} message - result message
+   * @return {boolean} - true if player is winner, otherwise false
+   */
   isGameWon(message) {
     if (message.winner === this.model.getPlayerId()) return true
     else return false
@@ -122,17 +154,25 @@ const testObject = { username: "testuser", ip: "192.168.0.1" }
 
 let connection = new WebSocket("ws://localhost:8080", ["soap", "xmpp"])
 
-// When the connection is open, send some data to the server
+/**
+ * When the connection is open, send some data to the server
+ */
 connection.onopen = function () {
   connection.send(JSON.stringify(testObject)) // Send the message 'Ping' to the server
 }
 
-// Log errors
+/**
+ * Log error
+ * @param {*} error
+ */
 connection.onerror = function (error) {
   console.log("WebSocket Error " + error)
 }
 
-// Log messages from the server
+/**
+ * Log messages from the server
+ * @param {Event} e
+ */
 connection.onmessage = function (e) {
   console.log("Server: " + e.data)
 
@@ -154,6 +194,10 @@ connection.onmessage = function (e) {
   }
 }
 
+/**
+ * Send message over connection
+ * @param {*} message - object to send
+ */
 function sendMessage(message) {
   connection.send(JSON.stringify(message))
 }
