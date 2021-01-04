@@ -78,6 +78,7 @@ svg .fill-red {
 
 svg text {
   font-size: .1rem;
+  font-family: 'Righteous', cursive;
 }
 
 svg text.small {

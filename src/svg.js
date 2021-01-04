@@ -324,6 +324,38 @@ class Svg {
 
 
 
+
+        //POT
+        this.potGroup = document.createElementNS(xmlns, "g");
+        this.svg.append(this.potGroup);
+        this.potGroup.id = "potGroup";
+        this.potGroup.setAttributeNS(null, 'transform', 'translate(30 30)');
+
+        var potTitle = document.createElementNS(xmlns, "text");
+        var potTitleContent = document.createTextNode( "Pot" );
+        potTitle.setAttributeNS(null, 'class', 'fill-white');
+        potTitle.appendChild(potTitleContent);
+        this.potGroup.appendChild(potTitle);
+
+        var potTitleBBox = potTitle.getBBox();
+        var potTitleWidth = potTitleBBox.width, potTitleHeight = potTitleBBox.height;
+
+        var potAmount = document.createElementNS(xmlns, "text");
+        var potAmountContent = document.createTextNode( "$ " + pokertable.pot );
+        potAmount.setAttributeNS(null, 'class', 'fill-white');
+        potAmount.setAttributeNS(null, 'transform', 'translate(0 '+ potTitleHeight * 1.5 +')');
+        potAmount.appendChild(potAmountContent);
+        this.potGroup.appendChild(potAmount);
+
+        var potDivider = document.createElementNS(xmlns, "rect");
+        potDivider.setAttributeNS(null, 'transform', 'translate(0 .7)');
+        potDivider.setAttributeNS(null, 'height', .2);
+        potDivider.setAttributeNS(null, 'width', potTitleWidth +2);
+        potDivider.setAttributeNS(null, 'class', 'fill-white');
+        this.potGroup.appendChild(potDivider);
+
+
+
     }
 
 
