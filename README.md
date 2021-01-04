@@ -11,3 +11,31 @@ Following environment variables need to be set before running the server:
 * WSPORT - the port the websocket will listen on
 ### Starting the server
 node server.js
+
+## How to generate documentation
+### Prerequisites
+Go to src folder.
+
+`npm install -g jsdoc`
+### Documentation
+To add documentation for a function, add a block comment in the following style before the function:
+```javascript
+ /**
+   * Send join message
+   * @param {string} username - username of the joining player
+   * @example
+   * sendJoin("john doe")
+   */
+  sendJoin = (username) => {
+    const message = { type: "join", name: username }
+    sendMessage(message)
+  }
+```
+[Further information: [JSDoc](https://jsdoc.app/), [CheatSheet](https://devhints.io/jsdoc)]
+
+Afterwards, generate the documentation of each file (e.g. controller.js) in the folder **"documentation"** using the command:
+
+`jsdoc -d documentation controller.js`
+
+The result is then available in **"index.html"** in the folder **"documentation"**.
+
