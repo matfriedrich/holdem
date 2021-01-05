@@ -98,13 +98,13 @@ function handleMessage(ws, message) {
       if (pokerTable.players.length === 1) {
         // player has won
         var message = {
-          type: "game_result",
+          type: "gameResult",
           winner: pokerTable.players[0].getId(),
         }
         pokerTable.connections.forEach(function each(player) {
           player.send(JSON.stringify(message))
         })
-        pokerTable = new PokerTable;
+        pokerTable = new PokerTable()
       }
       break
   }

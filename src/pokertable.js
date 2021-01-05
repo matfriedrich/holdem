@@ -18,7 +18,7 @@ class PokerTable {
   }
 
   /**
-   * Update the players 
+   * Update the players
    * @param {*} players Array of player objects
    */
   setPlayers(players) {
@@ -26,7 +26,7 @@ class PokerTable {
   }
 
   /**
-   * Update the pokertable 
+   * Update the pokertable
    * @param {*} msg message of type "tablestatus"
    */
   updatePokertable(msg) {
@@ -54,14 +54,15 @@ class PokerTable {
 
   /**
    * Set id of the player
-   * @param {*} id Id of the player 
+   * @param {*} id Id of the player
    */
   setPlayerId(id) {
     this.playerId = id
   }
 
   /**
-   * Returns playerId 
+   * Returns playerId
+   * @return {number} playerId
    */
   getPlayerId() {
     return this.playerId
