@@ -99,7 +99,7 @@ class SvgPlayer {
 class OtherPlayer extends SvgPlayer {
 
     constructor(name, balance){
-        console.log("OtherPlayer");
+        console.log("OtherPlayer()");
 
         super(name, balance);
     }
@@ -135,7 +135,7 @@ class OtherPlayer extends SvgPlayer {
 class SelfPlayer extends SvgPlayer {
 
     constructor(name, balance, card0 = null, card1 = null){
-        console.log("SelfPlayer: ", name, balance, card0, card1);
+        console.log("SelfPlayer()");
 
         super(name, balance);
 
