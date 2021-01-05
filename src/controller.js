@@ -116,8 +116,8 @@ class Controller {
   }
 
   /**
-   * Handle "game_result" message from server
-   * @param {*} msg - message of type "game_result"
+   * Handle "gameResult" message from server
+   * @param {*} msg - message of type "gameResult"
    */
   handleResult(msg) {
     if (this.isGameWon(msg)) {
@@ -197,7 +197,7 @@ connection.onmessage = function (e) {
     case "tablestatus":
       c.handleRound(msg)
       break
-    case "game_result":
+    case "gameResult":
       c.handleResult(msg)
       break
   }

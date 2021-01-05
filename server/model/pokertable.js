@@ -83,8 +83,8 @@ class PokerTable {
 
   getPlayerById(id) {
     var i
-    for(i = 0; i < this.players.length; i++){
-      if(id == this.players[i].getId()) {
+    for (i = 0; i < this.players.length; i++) {
+      if (id == this.players[i].getId()) {
         return this.players[i]
       }
     }
@@ -138,7 +138,9 @@ class PokerTable {
     ) {
       i++
     }
-    this.activePlayer = this.players[(this.activePlayer + i) % this.players.length].getId()
+    this.activePlayer = this.players[
+      (this.activePlayer + i) % this.players.length
+    ].getId()
   }
 
   getNextActivePlayer() {
@@ -226,7 +228,9 @@ class PokerTable {
       actions.bigblind
     )
     this.currentHighestBet = blinds.bigblind
-    this.activePlayer = this.players[(this.dealer + 3) % this.players.length].getId()
+    this.activePlayer = this.players[
+      (this.dealer + 3) % this.players.length
+    ].getId()
 
     this.setNextPlayersOptions()
   }
@@ -290,7 +294,8 @@ class PokerTable {
       return "fail"
     }
 
-    this.lastAction = this.getPlayerById(msg.player).getUsername() + " " + msg.action
+    this.lastAction =
+      this.getPlayerById(msg.player).getUsername() + " " + msg.action
 
     switch (msg.action) {
       case options.raise:
@@ -311,7 +316,8 @@ class PokerTable {
         this.getPlayerById(msg.player).setPrevaction(actions.call)
         this.setNextPlayersOptions()
         var difference =
-          this.currentHighestBet - this.getPlayerById(this.activePlayer).getBet()
+          this.currentHighestBet -
+          this.getPlayerById(this.activePlayer).getBet()
         this.placeBet(this.getPlayerById(msg.player), difference)
 
         if (this.checkEveryoneMadeTurn() && this.checkAllBetsAreSame()) {
@@ -450,7 +456,7 @@ class PokerTable {
       type: "tablestatus",
       state: this.state,
       pot: this.pot,
-      dealer: this.getPlayerById(this.dealer).getId(),
+      dealer: this.dealer,
       activePlayer: this.activePlayer,
       players: this.players,
       flop: flop,
