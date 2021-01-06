@@ -432,7 +432,7 @@ class PokerTable {
 
   removePlayersWithoutBalance() {
     var i = this.players.length
-    while (i--) {
+    for (i = this.players.length - 1; i >= 0; i--) {
       if (this.players[i].getBalance() <= 0) {
         this.playersLost.push(this.players[i])
         this.players.splice(i, 1)
