@@ -22,10 +22,8 @@ class View {
     this.svg = new Svg(this.svgBox)
     this.options = this.createElement("div")
     this.options.id = "options"
-    this.allin = this.createElement("div")
-    this.allin.id = "allinDrop"
 
-    this.allin.addEventListener("dragover", (event) => {
+    this.svgBox.addEventListener("dragover", (event) => {
       this.handleDragover(event)
     })
 
@@ -131,7 +129,7 @@ class View {
    * @param {*} handler Handler function of the controller
    */
   bindDrop(handler) {
-    this.allin.addEventListener("drop", (event) => {
+    this.svgBox.addEventListener("drop", (event) => {
       if (event.preventDefault) {
         event.preventDefault()
       }
@@ -185,7 +183,7 @@ class View {
     this.removeElement("joinButton")
     this.removeElement("usernameinput")
     this.removeElement("statisticsButton")
-    this.main.append(this.canvas, this.svgBox, this.allin, this.options)
+    this.main.append(this.canvas, this.svgBox, this.options)
 
     this.svg.setPotTranslations() //called after appending this.svgBox so that the translations can be calculated
 
@@ -215,9 +213,6 @@ class View {
     }
     while (this.options.firstChild) {
       this.options.removeChild(this.options.firstChild)
-    }
-    while (this.allin.firstChild) {
-      this.allin.removeChild(this.allin.firstChild)
     }
 
     var pot = this.createElement("p")
