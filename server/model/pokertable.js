@@ -431,10 +431,10 @@ class PokerTable {
   }
 
   removePlayersWithoutBalance() {
-    for (let player of this.players) {
-      if (player.getBalance() <= 0) {
-        this.playersLost.push(player)
-        this.players.splice(player.getId(), 1)
+    var i = this.players.length
+    while (i--) {
+      if (this.players[i].getBalance() <= 0) {
+        this.playersLost.push(this.players.splice(i, 1))
       }
     }
   }
