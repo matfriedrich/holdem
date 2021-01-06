@@ -46,6 +46,8 @@ class PokerTable {
     this.dealer = 0
     this.activePlayer
     this.players = []
+    this.playersFolded = []
+    this.playersLost = []
     this.flop = []
     this.turn
     this.river
@@ -204,6 +206,8 @@ class PokerTable {
       this.players[i].setIsActive(true)
       this.players[i].setIsAllin(false)
     }
+
+    this.playersFolded = []
 
     this.playersToRemove = []
     this.state = states.preflop
@@ -365,6 +369,7 @@ class PokerTable {
         break
       case options.fold:
         this.getPlayerById(msg.player).setIsActive(false)
+        this.playersFolded.push(this.getPlayerById(msg.player))
         if (this.playersLeftWithAction().length >= 1)
           this.setNextPlayersOptions()
 
@@ -418,11 +423,11 @@ class PokerTable {
   }
 
   removePlayersWithoutBalance() {
-    var i = this.players.length
-    while (i--) {
-      if (this.players[i].getBalance() <= 0) {
-        this.playersToRemove.push(i)
-        this.players.splice(i, 1)
+   for(let player of this.players) {
+      if (player.getBalance() <= 0) {
+        this.playersToRemove.push(player.getId())
+        this.playersLost.push(player)
+        this.players.splice(player.getId(), 1)
       }
     }
   }
@@ -459,13 +464,15 @@ class PokerTable {
       dealer: this.dealer,
       activePlayer: this.activePlayer,
       players: this.players,
+      playersFolded: this.playersFolded,
+      playersLost: this.playersLost,
       flop: flop,
       turn: turn,
       river: river,
       options: this.options,
       lastaction: this.lastAction,
       result: this.result,
-      playerToRemove: this.playersToRemove,
+      playersToRemove: this.playersToRemove,
     }
 
     return message

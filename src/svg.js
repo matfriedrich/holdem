@@ -341,10 +341,39 @@ class Svg {
                 this.playerSelfGroup.append(p.getCardGroup());
             }
             p.appendDetails(this.playerSelfGroup);
+        } else {
+            for(let playerLost of pokertable.playersLost){    //if you have lost
+                if(playerLost.id == ownPlayerID) {
+                    var oopsGroup = document.createElementNS(xmlns, 'g');
+                    var oopsTextNode = document.createElementNS(xmlns, 'text');
+                    oopsTextNode.setAttributeNS(null, 'class', 'fill-white');
+                    oopsTextNode.setAttributeNS(null, 'transform', 'scale(1.8)');
+                    var oopsTextContent = document.createTextNode( "Woah," );
+
+                    oopsTextNode.appendChild(oopsTextContent);
+                    oopsGroup.appendChild(oopsTextNode);
+                    this.playerSelfGroup.appendChild(oopsGroup);
+                    alignSvgObject(oopsGroup);
+
+                    var youLostGroup = document.createElementNS(xmlns, 'g');
+                    var youLostTextNode = document.createElementNS(xmlns, 'text');
+                    youLostTextNode.setAttributeNS(null, 'class', 'fill-white');
+                    var youLostTextContent = document.createTextNode( "You've lost all your money, Cowboy!" );
+                    youLostTextNode.appendChild(youLostTextContent);
+                    youLostGroup.appendChild(youLostTextNode);
+                    this.playerSelfGroup.appendChild(youLostGroup);
+                    alignSvgObject(youLostTextNode);
+
+                    var oopsGroupBBox = oopsGroup.getBBox();
+                    var oopsGroupWidth = oopsGroupBBox.width, oopsGroupHeight = oopsGroupBBox.height;
+                    youLostGroup.setAttributeNS(null, 'transform', 'translate( 0 '+ oopsGroupHeight +')')
+                }
+            }
         }
 
 
-        var otherPlayer = players[ (ownPlayerID + 1) % 4 ];
+        var otherPlayerId = (ownPlayerID + 1) % 4 ;
+        var otherPlayer = players[ otherPlayerId ];
         if( otherPlayer ) {    //left player
             var p = new OtherPlayer(otherPlayer.username, otherPlayer.balance);
             if(otherPlayer.card0 && otherPlayer.card1) {
@@ -352,10 +381,11 @@ class Svg {
             }
             p.appendDetails(this.playerLeftGroup);
         } else {
-            this.appendWaitingText(this.playerLeftGroup);
+            this.handleOtherPlayerLostOrWaiting(otherPlayerId, pokertable, this.playerLeftGroup);
         }
 
-        otherPlayer = players[ (ownPlayerID + 2) % 4 ];
+        otherPlayerId = (ownPlayerID + 2) % 4 ;
+        otherPlayer = players[ otherPlayerId ];
         if( otherPlayer ) {    //top player
             var p = new OtherPlayer(otherPlayer.username, otherPlayer.balance);
             if(otherPlayer.card0 && otherPlayer.card1) {
@@ -364,10 +394,11 @@ class Svg {
             p.appendDetails(this.playerTopGroup);
 
         } else {
-            this.appendWaitingText(this.playerTopGroup);
+            this.handleOtherPlayerLostOrWaiting(otherPlayerId, pokertable, this.playerTopGroup);
         }
 
-        otherPlayer = players[ (ownPlayerID + 3) % 4 ];
+        otherPlayerId = (ownPlayerID + 3) % 4 ;
+        otherPlayer = players[ otherPlayerId ];
         if( otherPlayer ) {    //right player
             var p = new OtherPlayer(otherPlayer.username, otherPlayer.balance);
             if(otherPlayer.card0 && otherPlayer.card1) {
@@ -376,7 +407,7 @@ class Svg {
             p.appendDetails(this.playerRightGroup);
 
         } else {
-            this.appendWaitingText(this.playerRightGroup);
+            this.handleOtherPlayerLostOrWaiting(otherPlayerId, pokertable, this.playerRightGroup);
         }
 
 
@@ -502,5 +533,30 @@ class Svg {
         return cardGroup;
     }
 
+    getOtherPlayerLostText(player) {
+        var oopsTextNode = document.createElementNS(xmlns, 'text');
+        oopsTextNode.setAttributeNS(null, 'class', 'fill-white');
+        var oopsTextContent = document.createTextNode( player.username + " lost all their money!");
+
+        oopsTextNode.appendChild(oopsTextContent);
+        return oopsTextNode;
+    }
+
+    handleOtherPlayerLostOrWaiting(playerId, pokertable, parentNode) {
+        var playerLost = null;
+        for(let player of pokertable.playersLost) {
+            if(player.id == playerId) {
+                playerLost = player;
+            }
+        }
+
+        if(playerLost) {
+            var playerLostText = this.getOtherPlayerLostText(playerLost)
+            parentNode.append( playerLostText );
+            alignSvgObject( playerLostText )
+        } else {
+            this.appendWaitingText(parentNode);
+        }
+    }
 
 }

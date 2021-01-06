@@ -294,5 +294,12 @@ class View {
         this.options.append(button)
       }
     }
+
+    var playersLost = this.createElement("p");
+    if(pokertable.playersLost) {
+      playersLost.textContent = pokertable.playersLost
+      this.main.appendChild(playersLost);
+    }
+
   }
 }

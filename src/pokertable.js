@@ -8,6 +8,8 @@ class PokerTable {
     this.game_running = 0
     this.playerId
     this.players = []
+    this.playersLost = []
+    this.playersFolded = []
     this.isActivePlayer
     this.flop = []
     this.river
@@ -37,9 +39,12 @@ class PokerTable {
       this.isActivePlayer = true
     }
 
-    msg.playerToRemove.forEach((element) => {
+    msg.playersToRemove.forEach((element) => {
       this.players.splice(element, 1)
     })
+
+    this.playersLost = msg.playersLost
+    this.playersFolded = msg.playersFolded
 
     this.players = msg.players
 
