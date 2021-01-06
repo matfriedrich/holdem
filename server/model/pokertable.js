@@ -60,24 +60,43 @@ class PokerTable {
     this.shuffleDeck()
   }
 
-  addPlayer(ws, username) {
-    var status = "fail"
-    var newPlayer = new Player(0, 1000, actions.noaction, username)
+  addConnection(ws) {
+    this.connections.push(ws)
+  }
 
-    if (this.players.length < 4) {
-      newPlayer.setId(this.players.length)
-      this.players.push(newPlayer)
-      status = "success"
-      this.connections.push(ws)
+  addPlayer(username) {
+    var newPlayer
+    if (this.players.length >= 4) {
+      return false
     }
+    newPlayer = new Player(0, 1000, actions.noaction, username)
+    newPlayer.setId(this.players.length)
+    this.players.push(newPlayer)
 
+    return true
+  }
+
+  getJoinMessageForJoiner(joinWasSuccessful) {
     var message = {
-      type: "join",
-      status: status,
-      player: newPlayer,
       existingplayers: this.players,
     }
+    message.type = "join"
 
+    if (joinWasSuccessful) {
+      message.status = "success"
+      message.player = this.getPlayerById(this.players.length - 1)
+    } else {
+      message.status = "fail"
+    }
+    return message
+  }
+
+  getJoinMessageForOthers() {
+    var message = {
+      player: this.getPlayerById(this.players.length - 1),
+      existingplayers: this.players,
+    }
+    message.type = "otherJoin"
     return message
   }
 

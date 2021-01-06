@@ -56,26 +56,28 @@ function handleMessage(ws, message) {
   switch (msg.type) {
     case "join":
       //console.log('Received join from client');
-      var payload = pokerTable.addPlayer(ws, msg.name)
-      ws.send(JSON.stringify(payload))
-
-      if (payload.status === "success") {
-        payload.type = "otherJoin"
+      var joinWasSuccessful = pokerTable.addPlayer(msg.name)
+      pokerTable.addConnection(ws)
+      var joinMessageForJoiner = pokerTable.getJoinMessageForJoiner(
+        joinWasSuccessful
+      )
+      ws.send(JSON.stringify(joinMessageForJoiner))
+      if (joinWasSuccessful) {
+        var joinMessageForOthers = pokerTable.getJoinMessageForOthers()
         wss.clients.forEach(function each(client) {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(payload))
+            client.send(JSON.stringify(joinMessageForOthers))
           }
         })
-      }
-
-      if (pokerTable.players.length === 4) {
-        setTimeout(function () {
-          pokerTable.startRound()
-          var payload = pokerTable.packTableAsMessage()
-          pokerTable.connections.forEach(function each(player) {
-            player.send(JSON.stringify(payload))
-          })
-        }, 1000)
+        if (pokerTable.players.length === 4) {
+          setTimeout(function () {
+            pokerTable.startRound()
+            var payload = pokerTable.packTableAsMessage()
+            pokerTable.connections.forEach(function each(player) {
+              player.send(JSON.stringify(payload))
+            })
+          }, 1000)
+        }
       }
 
       break
