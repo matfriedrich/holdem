@@ -58,7 +58,6 @@ class PokerTable {
     this.result
     this.currentHighestBet
     this.winningHand = ""
-    this.playersToRemove = []
     this.shuffleDeck()
   }
 
@@ -153,15 +152,7 @@ class PokerTable {
   }
 
   incrementActivePlayer() {
-    var i = 1
-    while (
-      !this.players[(this.activePlayer + i) % this.players.length].getIsActive()
-    ) {
-      i++
-    }
-    this.activePlayer = this.players[
-      (this.activePlayer + i) % this.players.length
-    ].getId()
+    this.activePlayer = this.players[this.getNextActivePlayer()].getId()
   }
 
   getNextActivePlayer() {
@@ -227,8 +218,6 @@ class PokerTable {
     }
 
     this.playersFolded = []
-
-    this.playersToRemove = []
     this.state = states.preflop
     this.pot = 0
     this.shuffleDeck()
@@ -299,11 +288,11 @@ class PokerTable {
     return true
   }
 
-  checkEveryoneIsAllin() {
+  checkEveryoneActiveIsAllin() {
     console.log("checking if everyone is all in")
     var i
     for (i = 0; i < this.players.length; i++) {
-      if (!this.players[i].getIsAllin()) {
+      if (this.players[i].getIsActive() && !this.players[i].getIsAllin()) {
         console.log("not everyone is all in")
         return false
       }
@@ -381,7 +370,7 @@ class PokerTable {
         }
         if (this.playersLeftWithAction().length >= 1)
           this.incrementActivePlayer()
-        if (this.checkEveryoneIsAllin() || this.state == states.result) {
+        if (this.checkEveryoneActiveIsAllin() || this.state == states.result) {
           var winners = this.determineWinner()
           this.resolveRound(winners)
         }
@@ -442,9 +431,8 @@ class PokerTable {
   }
 
   removePlayersWithoutBalance() {
-   for(let player of this.players) {
+    for (let player of this.players) {
       if (player.getBalance() <= 0) {
-        this.playersToRemove.push(player.getId())
         this.playersLost.push(player)
         this.players.splice(player.getId(), 1)
       }
@@ -491,7 +479,6 @@ class PokerTable {
       options: this.options,
       lastaction: this.lastAction,
       result: this.result,
-      playersToRemove: this.playersToRemove,
     }
 
     return message
