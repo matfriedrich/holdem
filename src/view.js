@@ -198,6 +198,12 @@ class View {
     this.svg.drawTable(pokertable)
   }
 
+  updateBoard(flop, turn, river) {
+    console.log("View.updateBoard()")
+
+    this.svg.updateBoard(flop, turn, river);
+  }
+
   updateTable(pokertable) {
     console.log("View. updateTable()")
 

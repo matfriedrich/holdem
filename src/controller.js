@@ -11,6 +11,7 @@ class Controller {
     this.view.bindAction(this.sendAction)
     this.view.bindDrop(this.sendAllin)
     this.model.bindPokertableChanged(this.onPokertableChanged)
+    this.model.bindBoardChanged(this.onBoardChanged)
     this.model.bindPlayersChanged(this.onPlayersChanged)
   }
 
@@ -136,6 +137,16 @@ class Controller {
    */
   onPokertableChanged = (pokertable) => {
     this.view.updateTable(pokertable)
+  }
+
+  /**
+   * Update Board if it changed
+   * @param {Array} flop - Flop to update
+   * @param {Card} turn - Turn card to update
+   * @param {Card} river - River card to update
+   */
+  onBoardChanged = (flop, turn, river) => {
+    this.view.updateBoard(flop, turn, river)
   }
 
   /**

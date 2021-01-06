@@ -18,6 +18,14 @@ class Model {
   }
 
   /**
+   * Bind onFlopChanged to callback
+   * @param {function} callback - function to call when Flop changes
+   */
+  bindBoardChanged(callback) {
+    this.onBoardChanged = callback
+  }
+
+  /**
    * Bind onPlayersChanged to callback
    * @param {function} callback - function to call when players change
    */
@@ -36,10 +44,20 @@ class Model {
   }
 
   /**
-   * Update pokertable and trigger onPokertableChanged
+   * Update pokertable and trigger onPokertableChanged, onFlopChanged, onRiverChanged and onTurnChanged
    * @param {*} message - new pokertable status
    */
   updatePokertable(message) {
+
+    if(this.pokertable.flop !== message.flop){
+      this.onBoardChanged(message.flop, message.turn, message.river);
+    } else if(this.pokertable.river !== message.river){
+      this.onBoardChanged(message.flop, message.turn, message.river);
+    } else if(this.pokertable.turn !== message.turn){
+      this.onBoardChanged(message.flop, message.turn, message.river);
+    }    
+
+    //update Pokertable AFTER checking changes on Board!
     this.pokertable.updatePokertable(message)
     this.onPokertableChanged(this.pokertable)
   }

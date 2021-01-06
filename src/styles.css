@@ -73,7 +73,7 @@ svg .fill-white {
 }
 
 svg .fill-red {
-  fill: #aa0404;
+  fill: #dc0000;
 }
 
 svg text {
@@ -94,14 +94,14 @@ svg text {
 }
 
 rect.card {
-  fill: #9f3f2c;
+  fill: #dc0000;
   stroke:#fdf9ea;
   stroke-width: .4%;
 }
 
 rect.card-front {
   fill: #fdf9ea;
-  stroke:#9f3f2c;
+  stroke:#dc0000;
   stroke-width: .4%;
 }
 

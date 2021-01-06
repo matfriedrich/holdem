@@ -29,6 +29,10 @@ class SvgSuit {
         var suitPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
         suitPath.setAttributeNS(null, "d", suit);
 
+        if(suit == suits.diamonds || suit == suits.hearts) {
+            suitPath.setAttributeNS(null, "class", 'fill-red');
+        }
+
         return suitPath;
     }
 

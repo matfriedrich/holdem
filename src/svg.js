@@ -1,5 +1,6 @@
 const xmlns = "http://www.w3.org/2000/svg";
 
+const cardHeight = 7, cardWidth = 4.8;
 
 function  alignSvgObject(object) {
     var bbox = object.getBBox();
@@ -117,8 +118,8 @@ class OtherPlayer extends SvgPlayer {
     }
 
     createCard(rotation = 15, translationX = 0) {
-        var  height = 7;
-        var width = 4;
+        var  height = cardHeight;
+        var width = cardWidth;
 
         var card = document.createElementNS(xmlns, "rect");
         card.setAttributeNS(null, 'width', width);
@@ -156,8 +157,8 @@ class SelfPlayer extends SvgPlayer {
     }
 
     createCard(cardObject = this.card0, rotation = 15, translationX = 0) {
-        var  height = 7;
-        var width = 4;
+        var  height = cardHeight;
+        var width = cardWidth;
 
         var cardGroup = document.createElementNS(xmlns, "g");
         cardGroup.setAttributeNS(null, 'transform', 'translate('+ translationX +' -4) rotate('+rotation+ ')');
@@ -186,16 +187,20 @@ class SelfPlayer extends SvgPlayer {
             }
 
             if(suit) {
-                suit.setAttributeNS(null, 'transform', 'translate(-2 -1.3) scale(0.01)');
+                suit.setAttributeNS(null, 'transform', 'translate(-1.8 -1.3) scale(0.01)');
                 cardGroup.append(suit);
             }
 
             //VALUE
             var cardValueSvg = document.createElementNS(xmlns, 'text');
             var cardValueSvgText = document.createTextNode( cardObject.value );
-            cardValueSvg.setAttributeNS(null, 'transform', 'translate(.5 1.5)');
+            cardValueSvg.setAttributeNS(null, 'transform', 'translate(.6 1.6)');
             cardValueSvg.appendChild(cardValueSvgText);
             cardGroup.appendChild(cardValueSvg);
+
+            if(cardObject.suit == 'h'|| cardObject.suit == 'd') {
+                cardValueSvg.setAttributeNS(null, "class", 'fill-red');
+            }
         }
 
         return cardGroup;
@@ -205,6 +210,12 @@ class SelfPlayer extends SvgPlayer {
 class Svg {
 
     constructor(parent){
+
+      this.cardValueNodes = {};
+      this.flopNodes = [];
+      this.riverNode
+      this.turnNode
+
       console.log("SVG");
       this.svg = document.createElementNS(xmlns, "svg");
       this.svg.id = "svgArea";
@@ -254,6 +265,12 @@ class Svg {
       this.potDivider.setAttributeNS(null, 'height', .2);
       this.potDivider.setAttributeNS(null, 'class', 'fill-white');
       this.potGroup.appendChild(this.potDivider);
+
+      //define Board Position
+      this.boardGroup = document.createElementNS(xmlns, "g");
+      this.svg.append(this.boardGroup);
+      this.boardGroup.id = "boardGroup";
+      this.boardGroup.setAttributeNS(null, 'transform', 'translate(50 20)');
     }
 
     createCircle(cx = 0, cy = 0, r = 1) {
@@ -367,7 +384,6 @@ class Svg {
 
         this.updatePot(pokertable.pot);
 
-
     }
 
     updatePot(potValue) {
@@ -381,6 +397,109 @@ class Svg {
         this.potAmount.setAttributeNS(null, 'transform', 'translate(0 '+ potTitleHeight * 1.5 +')');
 
         this.potDivider.setAttributeNS(null, 'width', potTitleWidth +2);
+    }
+
+    updateBoard(flop, turn, river) {
+        console.log("SVG.updateBoard()")
+
+        while(this.boardGroup.firstChild) {    //reset Board
+            this.boardGroup.removeChild(this.boardGroup.firstChild);
+        }
+        this.cardValueNodes = [];   //reset the value nodes that can be copied once created
+
+
+        let i = flop.length - 1;
+        for( let card of flop) {
+            var cardNode = this.getBoardCardNode(card);
+            cardNode.setAttributeNS(null, 'transform', 'translate('+ ( (- cardWidth - 1.5) * i ) +')' );
+            i--;
+            this.boardGroup.appendChild(cardNode);
+        }
+
+        var turnNode = this.getBoardCardNode(turn);
+        turnNode.setAttributeNS(null, 'transform', 'translate('+ ( ( cardWidth + 1.5) * 1 ) +')' );
+        this.boardGroup.appendChild(turnNode);
+
+        var riverNode = this.getBoardCardNode(river);
+        riverNode.setAttributeNS(null, 'transform', 'translate('+ ( ( cardWidth + 1.5) * 2 ) +')' );
+        this.boardGroup.appendChild(riverNode);
+    }
+
+    getBoardCardNode(card = null) {
+        var  height = cardHeight;
+        var width = cardWidth;
+
+        var cardGroup = document.createElementNS(xmlns, "g");
+
+        if(card) {
+            var cardRect = document.createElementNS(xmlns, "rect");
+            cardRect.setAttributeNS(null, 'width', width);
+            cardRect.setAttributeNS(null, 'height', height);
+            cardRect.setAttributeNS(null, 'ry', '2%');
+
+            cardRect.setAttributeNS(null, 'class', 'card card-front');
+            cardGroup.append(cardRect);
+
+            //SUIT
+            var suit = null;
+            switch(card.suit) {
+                case 'c':   suit = SvgSuit.getSvg(SvgSuit.clubs);
+                            break;
+                case 'h':   suit = SvgSuit.getSvg(SvgSuit.hearts);
+                            break;
+                case 'd':   suit = SvgSuit.getSvg(SvgSuit.diamonds);
+                            break;
+                case 's':   suit = SvgSuit.getSvg(SvgSuit.spades);
+                            break;
+            }
+
+            if(suit) {
+                suit.setAttributeNS(null, 'transform', 'translate(-1.8 -1.3) scale(0.01)');
+                cardGroup.append(suit);
+            }
+
+
+
+            //VALUE
+            var cardValueSvg = null, cardValueSvgReverse = null;
+            var coloredValue = 'Black' + card.value;
+            if(card.suit == 'h'|| card.suit == 'd') {
+                coloredValue = 'Red' + card.value; 
+            }
+            if(this.cardValueNodes.hasOwnProperty(coloredValue)) {    //the needed Node already exists
+                cardValueSvg = document.createElementNS(xmlns, 'use');
+                cardValueSvg.setAttributeNS(null, 'href', '#cardValue' + coloredValue);
+                cardGroup.appendChild(cardValueSvg);
+            } else {
+                cardValueSvg = document.createElementNS(xmlns, 'text');
+                cardValueSvg.id = 'cardValue' + coloredValue;
+                var cardValueSvgText = document.createTextNode( card.value );
+                cardValueSvg.setAttributeNS(null, 'transform', 'translate(.6 1.6)');
+                cardValueSvg.appendChild(cardValueSvgText);
+                cardGroup.appendChild(cardValueSvg);
+
+                this.cardValueNodes[ coloredValue ] = cardValueSvg;
+            }
+
+            //VALUE UPSIDE DOWN
+            if(this.cardValueNodes.hasOwnProperty(coloredValue)) {    //the needed Node should already exist
+                cardValueSvgReverse = document.createElementNS(xmlns, 'use');
+                cardValueSvgReverse.setAttributeNS(null, 'href', '#cardValue' + coloredValue);
+                cardValueSvgReverse.setAttributeNS(null, 'transform', 'translate('+ cardWidth + ' ' + cardHeight + ') rotate(180)  ');
+                cardGroup.appendChild(cardValueSvgReverse);
+
+            }
+
+            /* Hint on working with 'use':
+            *  Pay attention to fill-color of object that ought to be used.
+            */
+            if(card.suit == 'h'|| card.suit == 'd') {
+                cardValueSvg.setAttributeNS(null, "class", 'fill-red');
+                cardValueSvgReverse.setAttributeNS(null, "class", 'fill-red');
+            }
+        }
+
+        return cardGroup;
     }
 
 
