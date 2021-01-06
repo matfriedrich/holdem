@@ -146,8 +146,9 @@ class View {
   createAllinImg() {
     var allin = this.createElement("img")
     allin.id = "allin"
-    allin.src = "chips.jpg"
+    allin.src = "chips.png"
     allin.draggable = "true"
+    allin.style.width = "20%"
 
     allin.addEventListener("dragstart", (event) => {
       this.handleDragStart(event)
@@ -201,7 +202,7 @@ class View {
   updateBoard(flop, turn, river) {
     console.log("View.updateBoard()")
 
-    this.svg.updateBoard(flop, turn, river);
+    this.svg.updateBoard(flop, turn, river)
   }
 
   updateTable(pokertable) {
