@@ -492,6 +492,9 @@ class Svg {
 
 
             //VALUE
+            if(card.value == 'T') {
+                card.value = 10;
+            }
             var cardValueSvg = null, cardValueSvgReverse = null;
             var coloredValue = 'Black' + card.value;
             if(card.suit == 'h'|| card.suit == 'd') {
