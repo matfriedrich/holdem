@@ -15,8 +15,6 @@ class View {
     this.main = this.createElement("div");
     this.main.className = "flex-container";
 
-    this.canvas = this.createElement("div");
-    this.canvas.id = "canvas";
     this.svgBox = this.createElement("div");
     this.svgBox.id = "svgBox";
     this.svg = new Svg(this.svgBox);
@@ -180,11 +178,10 @@ class View {
   displayTable(pokertable) {
     console.log("View. displayTable()");
 
-    // Todo: Canvas stuff
     this.removeElement("joinButton");
     this.removeElement("usernameinput");
     this.removeElement("statisticsButton");
-    this.main.append(this.canvas, this.svgBox, this.options);
+    this.main.append(this.svgBox, this.options);
 
     this.svg.setPotTranslations(); //called after appending this.svgBox so that the translations can be calculated
 
@@ -206,82 +203,11 @@ class View {
   updateTable(pokertable) {
     console.log("View. updateTable()");
 
-    // Todo: Canvas stuff
     this.svg.drawTable(pokertable);
 
-    while (this.canvas.firstChild) {
-      this.canvas.removeChild(this.canvas.firstChild);
-    }
     while (this.options.firstChild) {
       this.options.removeChild(this.options.firstChild);
     }
-
-    var pot = this.createElement("p");
-    pot.textContent = "Pot: " + pokertable.pot.toString();
-
-    var flop = this.createElement("p");
-    flop.textContent =
-      "First: " +
-      pokertable.flop[0].value +
-      " " +
-      pokertable.flop[0].suit +
-      " Second: " +
-      pokertable.flop[1].value +
-      " " +
-      pokertable.flop[1].suit +
-      " Third: " +
-      pokertable.flop[2].value +
-      " " +
-      pokertable.flop[2].suit;
-
-    var turn = this.createElement("p");
-    turn.textContent =
-      "Turn: " + pokertable.turn.value + " " + pokertable.turn.suit;
-
-    var river = this.createElement("p");
-    river.textContent =
-      "River: " + pokertable.river.value + " " + pokertable.river.suit;
-
-    var players = [];
-    var i;
-
-    for (i = 0; i < pokertable.players.length; i++) {
-      players.push(this.createElement("p"));
-      players[i].textContent =
-        pokertable.players[i].username.toString() +
-        " Balance: " +
-        pokertable.players[i].balance.toString() +
-        " Card0: " +
-        pokertable.players[i].card0.value +
-        " " +
-        pokertable.players[i].card0.suit +
-        " Card1: " +
-        pokertable.players[i].card1.value +
-        " " +
-        pokertable.players[i].card1.suit +
-        " Bet: " +
-        pokertable.players[i].bet;
-    }
-
-    var lastaction = this.createElement("p");
-    lastaction.textContent = pokertable.lastAction;
-
-    var result = this.createElement("p");
-    result.textContent = pokertable.result;
-
-    this.canvas.append(
-      pot,
-      flop,
-      turn,
-      river,
-      players[0],
-      players[1],
-      players[2],
-      players[3],
-      lastaction,
-      result
-    );
-
     var j;
 
     if (pokertable.isActivePlayer) {

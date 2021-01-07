@@ -16,6 +16,7 @@ class PokerTable {
   constructor() {
     console.log("PokerTable");
     this.pot = 0;
+    this.dealerId = 0;
     this.game_running = 0;
     this.playerId;
     this.players = [];
@@ -54,6 +55,8 @@ class PokerTable {
     this.playersFolded = msg.playersFolded;
 
     this.players = msg.players;
+
+    this.dealerId = msg.dealerId;
 
     this.flop = msg.flop;
     this.turn = msg.turn;

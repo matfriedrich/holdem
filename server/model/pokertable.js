@@ -481,7 +481,7 @@ class PokerTable {
       type: "tablestatus",
       state: this.state,
       pot: this.pot,
-      dealer: dealerId,
+      dealerId: dealerId,
       activePlayer: activePlayerId,
       players: this.players,
       playersFolded: this.playersFolded,

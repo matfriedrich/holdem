@@ -128,7 +128,10 @@ class Controller {
       this.model.storeResult(false);
       alert("Player " + msg.winner + " has won");
     }
-    location.reload();
+
+    setTimeout(function () {
+      location.reload();
+    }, 3000);
   }
 
   /**
