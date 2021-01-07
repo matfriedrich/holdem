@@ -192,6 +192,9 @@ class SelfPlayer extends SvgPlayer {
             }
 
             //VALUE
+            if(cardObject.value == 'T') {
+                cardObject.value = 10;
+            }
             var cardValueSvg = document.createElementNS(xmlns, 'text');
             var cardValueSvgText = document.createTextNode( cardObject.value );
             cardValueSvg.setAttributeNS(null, 'transform', 'translate(.6 1.6)');
