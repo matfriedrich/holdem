@@ -11,13 +11,15 @@ body {
   text-align: center;
 }
 
-button, .btn {
+button,
+.btn {
   margin: 0 1rem;
 }
 
-input, 
-button, .btn {
-  padding: .3rem .5rem;
+input,
+button,
+.btn {
+  padding: 0.3rem 0.5rem;
 }
 
 .flex_container {
@@ -29,7 +31,7 @@ button, .btn {
 }
 
 #root {
-  width:1600px;
+  width: 1600px;
   max-width: 100%;
   margin: 2rem auto;
   padding: 0 1rem;
@@ -65,6 +67,9 @@ button, .btn {
   min-height: 100px;
 }
 
+.text-italic {
+  font-style: italic;
+}
 
 svg text.text-white,
 svg .fill-white {
@@ -77,14 +82,13 @@ svg .fill-red {
 }
 
 svg text {
-  font-size: .1rem;
-  font-family: 'Righteous', cursive;
+  font-size: 0.1rem;
+  font-family: "Righteous", cursive;
 }
 
 svg text.small {
-  font-size: .067rem;
+  font-size: 0.067rem;
 }
-
 
 svg rect,
 svg g,
@@ -95,17 +99,20 @@ svg text {
 
 rect.card {
   fill: #dc0000;
-  stroke:#fdf9ea;
-  stroke-width: .4%;
+  stroke: #fdf9ea;
+  stroke-width: 0.4%;
 }
 
 rect.card-front {
   fill: #fdf9ea;
-  stroke:#dc0000;
-  stroke-width: .4%;
+  stroke: #dc0000;
+  stroke-width: 0.4%;
 }
 
-circle.pulse { fill: #fdf9ea; animation: pulse 2s alternate infinite; }
+circle.pulse {
+  fill: #fdf9ea;
+  animation: pulse 2s alternate infinite;
+}
 @keyframes pulse {
   100% {
     r: 1.25;

@@ -1,12 +1,12 @@
-const GAMES_TOTAL = "games_total"
-const GAMES_WON = "games_won"
+const GAMES_TOTAL = "games_total";
+const GAMES_WON = "games_won";
 
 class Model {
   /**
    * Creates a new Model Object
    */
   constructor() {
-    this.pokertable = new PokerTable()
+    this.pokertable = new PokerTable();
   }
 
   /**
@@ -14,7 +14,7 @@ class Model {
    * @param {function} callback - function to call when pokertable changes
    */
   bindPokertableChanged(callback) {
-    this.onPokertableChanged = callback
+    this.onPokertableChanged = callback;
   }
 
   /**
@@ -22,7 +22,7 @@ class Model {
    * @param {function} callback - function to call when Flop changes
    */
   bindBoardChanged(callback) {
-    this.onBoardChanged = callback
+    this.onBoardChanged = callback;
   }
 
   /**
@@ -30,7 +30,7 @@ class Model {
    * @param {function} callback - function to call when players change
    */
   bindPlayersChanged(callback) {
-    this.onPlayersChanged = callback
+    this.onPlayersChanged = callback;
   }
 
   /**
@@ -38,9 +38,9 @@ class Model {
    * @param {Player[]} players - array of players to set on the pokertable
    */
   setPlayers(players) {
-    this.pokertable.setPlayers(players)
+    this.pokertable.setPlayers(players);
 
-    this.onPlayersChanged(this.pokertable) //notify view
+    this.onPlayersChanged(this.pokertable); //notify view
   }
 
   /**
@@ -48,18 +48,17 @@ class Model {
    * @param {*} message - new pokertable status
    */
   updatePokertable(message) {
-
-    if(this.pokertable.flop !== message.flop){
+    if (this.pokertable.flop !== message.flop) {
       this.onBoardChanged(message.flop, message.turn, message.river);
-    } else if(this.pokertable.river !== message.river){
+    } else if (this.pokertable.river !== message.river) {
       this.onBoardChanged(message.flop, message.turn, message.river);
-    } else if(this.pokertable.turn !== message.turn){
+    } else if (this.pokertable.turn !== message.turn) {
       this.onBoardChanged(message.flop, message.turn, message.river);
-    }    
+    }
 
     //update Pokertable AFTER checking changes on Board!
-    this.pokertable.updatePokertable(message)
-    this.onPokertableChanged(this.pokertable)
+    this.pokertable.updatePokertable(message);
+    this.onPokertableChanged(this.pokertable);
   }
 
   /**
@@ -67,15 +66,15 @@ class Model {
    * @param {boolean} is_game_won - true if game was won, otherwise false
    */
   storeResult(is_game_won) {
-    var gamesTotal = localStorage.getItem(GAMES_TOTAL)
-    if (!gamesTotal) gamesTotal = 0
-    var gamesWon = localStorage.getItem(GAMES_WON)
-    if (!gamesWon) gamesWon = 0
+    var gamesTotal = localStorage.getItem(GAMES_TOTAL);
+    if (!gamesTotal) gamesTotal = 0;
+    var gamesWon = localStorage.getItem(GAMES_WON);
+    if (!gamesWon) gamesWon = 0;
 
-    localStorage.setItem(GAMES_TOTAL, ++gamesTotal)
-    if (is_game_won) localStorage.setItem(GAMES_WON, ++gamesWon)
-    console.log("TOTAL: " + localStorage.getItem(GAMES_TOTAL))
-    console.log("WON:   " + localStorage.getItem(GAMES_WON))
+    localStorage.setItem(GAMES_TOTAL, ++gamesTotal);
+    if (is_game_won) localStorage.setItem(GAMES_WON, ++gamesWon);
+    console.log("TOTAL: " + localStorage.getItem(GAMES_TOTAL));
+    console.log("WON:   " + localStorage.getItem(GAMES_WON));
   }
 
   /**
@@ -83,16 +82,16 @@ class Model {
    * @return {number[]} - first: total games, second: won games
    */
   retrieveResults() {
-    var statistics = []
-    var gamesTotal = localStorage.getItem(GAMES_TOTAL)
-    if (!gamesTotal) gamesTotal = 0
-    var gamesWon = localStorage.getItem(GAMES_WON)
-    if (!gamesWon) gamesWon = 0
+    var statistics = [];
+    var gamesTotal = localStorage.getItem(GAMES_TOTAL);
+    if (!gamesTotal) gamesTotal = 0;
+    var gamesWon = localStorage.getItem(GAMES_WON);
+    if (!gamesWon) gamesWon = 0;
 
-    statistics.push(gamesTotal)
-    statistics.push(gamesWon)
+    statistics.push(gamesTotal);
+    statistics.push(gamesWon);
 
-    return statistics
+    return statistics;
   }
 
   /**
@@ -100,7 +99,7 @@ class Model {
    * @param {number} id
    */
   setPlayerId(id) {
-    this.pokertable.setPlayerId(id)
+    this.pokertable.setPlayerId(id);
   }
 
   /**
@@ -108,6 +107,6 @@ class Model {
    * @return {number} id
    */
   getPlayerId() {
-    return this.pokertable.getPlayerId()
+    return this.pokertable.getPlayerId();
   }
 }
