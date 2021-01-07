@@ -57,7 +57,7 @@ function handleMessage(ws, message) {
     case "join":
       //console.log('Received join from client');
       var joinWasSuccessful = pokerTable.addPlayer(msg.name)
-      pokerTable.addConnection(ws)
+      if (joinWasSuccessful) pokerTable.addConnection(ws)
       var joinMessageForJoiner = pokerTable.getJoinMessageForJoiner(
         joinWasSuccessful
       )

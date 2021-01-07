@@ -43,8 +43,8 @@ class PokerTable {
   constructor() {
     this.state
     this.pot = 0
-    this.dealer = 0
-    this.activePlayer
+    this.dealerIndex = 0
+    this.activePlayerIndex
     this.players = []
     this.playersFolded = []
     this.playersLost = []
@@ -58,7 +58,6 @@ class PokerTable {
     this.result
     this.currentHighestBet
     this.winningHand = ""
-    this.playersToRemove = []
     this.shuffleDeck()
   }
 
@@ -68,7 +67,7 @@ class PokerTable {
 
   addPlayer(username) {
     var newPlayer
-    if (this.players.length >= 4) {
+    if (this.players.length + this.playersLost.length >= 4) {
       return false
     }
     newPlayer = new Player(0, 1000, actions.noaction, username)
@@ -153,25 +152,20 @@ class PokerTable {
   }
 
   incrementActivePlayer() {
-    var i = 1
-    while (
-      !this.players[(this.activePlayer + i) % this.players.length].getIsActive()
-    ) {
-      i++
-    }
-    this.activePlayer = this.players[
-      (this.activePlayer + i) % this.players.length
-    ].getId()
+    this.activePlayerIndex = this.getNextActivePlayer()
   }
 
   getNextActivePlayer() {
     var i = 1
+
     while (
-      !this.players[(this.activePlayer + i) % this.players.length].getIsActive()
+      !this.players[
+        (this.activePlayerIndex + i) % this.players.length
+      ].getIsActive()
     ) {
       i++
     }
-    return (this.activePlayer + i) % this.players.length
+    return (this.activePlayerIndex + i) % this.players.length
   }
 
   isNextPlayerBalanceEnoughForCall() {
@@ -189,7 +183,7 @@ class PokerTable {
   }
 
   incrementDealer() {
-    this.dealer = (this.dealer + 1) % this.players.length
+    this.dealerIndex = (this.dealerIndex + 1) % this.players.length
   }
 
   playersLeft() {
@@ -227,8 +221,6 @@ class PokerTable {
     }
 
     this.playersFolded = []
-
-    this.playersToRemove = []
     this.state = states.preflop
     this.pot = 0
     this.shuffleDeck()
@@ -237,23 +229,21 @@ class PokerTable {
     this.lastAction = "New Round"
     this.result = ""
     this.placeBet(
-      this.players[(this.dealer + 1) % this.players.length],
+      this.players[(this.dealerIndex + 1) % this.players.length],
       blinds.smallblind
     )
-    this.players[(this.dealer + 1) % this.players.length].setPrevaction(
+    this.players[(this.dealerIndex + 1) % this.players.length].setPrevaction(
       actions.smallblind
     )
     this.placeBet(
-      this.players[(this.dealer + 2) % this.players.length],
+      this.players[(this.dealerIndex + 2) % this.players.length],
       blinds.bigblind
     )
-    this.players[(this.dealer + 2) % this.players.length].setPrevaction(
+    this.players[(this.dealerIndex + 2) % this.players.length].setPrevaction(
       actions.bigblind
     )
     this.currentHighestBet = blinds.bigblind
-    this.activePlayer = this.players[
-      (this.dealer + 3) % this.players.length
-    ].getId()
+    this.activePlayerIndex = (this.dealerIndex + 3) % this.players.length
 
     this.setNextPlayersOptions()
   }
@@ -268,7 +258,7 @@ class PokerTable {
   }
 
   checkEveryoneMadeTurn() {
-    console.log("checking if everonye made turn")
+    //console.log("checking if everonye made turn")
     var i
     for (i = 0; i < this.players.length; i++) {
       var prevact = this.players[i].getPrevaction()
@@ -277,7 +267,7 @@ class PokerTable {
           (prevact == actions.noaction || prevact == actions.bigblind)) ||
         prevact == actions.smallblind
       ) {
-        console.log("not everyone made turn")
+        //console.log("not everyone made turn")
         return false
       }
     }
@@ -285,26 +275,26 @@ class PokerTable {
   }
 
   checkAllBetsAreSame() {
-    console.log("checking if all bets are same")
+    //console.log("checking if all bets are same")
     var i
     for (i = 0; i < this.players.length; i++) {
       if (
         this.players[i].getIsActive() &&
         this.players[i].getBet() != this.currentHighestBet
       ) {
-        console.log("not all bets are same")
+        //console.log("not all bets are same")
         return false
       }
     }
     return true
   }
 
-  checkEveryoneIsAllin() {
-    console.log("checking if everyone is all in")
+  checkEveryoneActiveIsAllin() {
+    //console.log("checking if everyone is all in")
     var i
     for (i = 0; i < this.players.length; i++) {
-      if (!this.players[i].getIsAllin()) {
-        console.log("not everyone is all in")
+      if (this.players[i].getIsActive() && !this.players[i].getIsAllin()) {
+        //console.log("not everyone is all in")
         return false
       }
     }
@@ -312,7 +302,7 @@ class PokerTable {
   }
 
   processAction(msg) {
-    if (msg.player !== this.activePlayer) {
+    if (msg.player !== this.players[this.activePlayerIndex].getId()) {
       console.log("Action not from active player - something is wrong")
       return "fail"
     }
@@ -339,14 +329,13 @@ class PokerTable {
         this.getPlayerById(msg.player).setPrevaction(actions.call)
         this.setNextPlayersOptions()
         var difference =
-          this.currentHighestBet -
-          this.getPlayerById(this.activePlayer).getBet()
+          this.currentHighestBet - this.players[this.activePlayerIndex].getBet()
         this.placeBet(this.getPlayerById(msg.player), difference)
 
         if (this.checkEveryoneMadeTurn() && this.checkAllBetsAreSame()) {
           this.state++
           this.resetPlayerForTurn()
-          this.activePlayer = this.dealer
+          this.activePlayerIndex = this.dealerIndex
         }
         this.incrementActivePlayer()
         if (
@@ -377,11 +366,11 @@ class PokerTable {
         if (this.checkEveryoneMadeTurn() && this.checkAllBetsAreSame()) {
           this.state++
           this.resetPlayerForTurn()
-          this.activePlayer = this.dealer
+          this.activePlayerIndex = this.dealerIndex
         }
         if (this.playersLeftWithAction().length >= 1)
           this.incrementActivePlayer()
-        if (this.checkEveryoneIsAllin() || this.state == states.result) {
+        if (this.checkEveryoneActiveIsAllin() || this.state == states.result) {
           var winners = this.determineWinner()
           this.resolveRound(winners)
         }
@@ -442,11 +431,11 @@ class PokerTable {
   }
 
   removePlayersWithoutBalance() {
-   for(let player of this.players) {
-      if (player.getBalance() <= 0) {
-        this.playersToRemove.push(player.getId())
-        this.playersLost.push(player)
-        this.players.splice(player.getId(), 1)
+    var i = this.players.length
+    for (i = this.players.length - 1; i >= 0; i--) {
+      if (this.players[i].getBalance() <= 0) {
+        this.playersLost.push(this.players[i])
+        this.players.splice(i, 1)
       }
     }
   }
@@ -455,6 +444,13 @@ class PokerTable {
     var flop = [0, 0, 0]
     var turn = 0
     var river = 0
+    var activePlayerId = 0
+    var dealerId = 0
+
+    if (this.activePlayerIndex < this.players.length)
+      activePlayerId = this.players[this.activePlayerIndex].getId()
+    if (this.dealerIndex < this.players.length)
+      dealerId = this.players[this.dealerIndex].getId()
 
     switch (this.state) {
       case states.flop:
@@ -480,8 +476,8 @@ class PokerTable {
       type: "tablestatus",
       state: this.state,
       pot: this.pot,
-      dealer: this.dealer,
-      activePlayer: this.activePlayer,
+      dealer: dealerId,
+      activePlayer: activePlayerId,
       players: this.players,
       playersFolded: this.playersFolded,
       playersLost: this.playersLost,
@@ -491,7 +487,6 @@ class PokerTable {
       options: this.options,
       lastaction: this.lastAction,
       result: this.result,
-      playersToRemove: this.playersToRemove,
     }
 
     return message

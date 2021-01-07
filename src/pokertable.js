@@ -39,10 +39,6 @@ class PokerTable {
       this.isActivePlayer = true
     }
 
-    msg.playersToRemove.forEach((element) => {
-      this.players.splice(element, 1)
-    })
-
     this.playersLost = msg.playersLost
     this.playersFolded = msg.playersFolded
 
