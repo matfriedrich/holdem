@@ -7,28 +7,27 @@ const actions = {
   smallblind: 5,
   bigblind: 6,
   noaction: 7,
-};
+}
 
 class PokerTable {
   /**
    * Creates a new PokerTable Object
    */
   constructor() {
-    console.log("PokerTable");
-    this.pot = 0;
-    this.dealerId = 0;
-    this.game_running = 0;
-    this.playerId;
-    this.players = [];
-    this.playersLost = [];
-    this.playersFolded = [];
-    this.isActivePlayer;
-    this.flop = [];
-    this.river;
-    this.turn;
-    this.options;
-    this.lastAction;
-    this.result;
+    console.log("PokerTable")
+    this.pot = 0
+    this.dealerId = 0
+    this.game_running = 0
+    this.playerId
+    this.players = []
+    this.playersLost = []
+    this.isActivePlayer
+    this.flop = []
+    this.river
+    this.turn
+    this.options
+    this.lastAction
+    this.result
   }
 
   /**
@@ -36,7 +35,7 @@ class PokerTable {
    * @param {*} players Array of player objects
    */
   setPlayers(players) {
-    this.players = players;
+    this.players = players
   }
 
   /**
@@ -44,27 +43,26 @@ class PokerTable {
    * @param {*} msg message of type "tablestatus"
    */
   updatePokertable(msg) {
-    this.pot = msg.pot;
-    this.isActivePlayer = false;
+    this.pot = msg.pot
+    this.isActivePlayer = false
 
     if (this.playerId == msg.activePlayer) {
-      this.isActivePlayer = true;
+      this.isActivePlayer = true
     }
 
-    this.playersLost = msg.playersLost;
-    this.playersFolded = msg.playersFolded;
+    this.playersLost = msg.playersLost
 
-    this.players = msg.players;
+    this.players = msg.players
 
-    this.dealerId = msg.dealerId;
+    this.dealerId = msg.dealerId
 
-    this.flop = msg.flop;
-    this.turn = msg.turn;
-    this.river = msg.river;
+    this.flop = msg.flop
+    this.turn = msg.turn
+    this.river = msg.river
 
-    this.options = msg.options;
-    this.lastAction = msg.lastaction;
-    this.result = msg.result;
+    this.options = msg.options
+    this.lastAction = msg.lastaction
+    this.result = msg.result
   }
 
   /**
@@ -72,7 +70,7 @@ class PokerTable {
    * @param {*} id Id of the player
    */
   setPlayerId(id) {
-    this.playerId = id;
+    this.playerId = id
   }
 
   /**
@@ -80,6 +78,6 @@ class PokerTable {
    * @return {number} playerId
    */
   getPlayerId() {
-    return this.playerId;
+    return this.playerId
   }
 }
