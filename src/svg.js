@@ -726,11 +726,7 @@ class Svg {
 
   appendDealerButton(parentNode) {
     var buttonGroup = document.createElementNS(xmlns, "g");
-    buttonGroup.setAttributeNS(
-      null,
-      "transform",
-      "scale(0.4) translate(10 15)"
-    );
+    buttonGroup.setAttributeNS(null, "transform", "scale(0.4) translate(18 2)");
     var buttonCircle = this.createCircle();
     buttonCircle.setAttributeNS(null, "class", "dealerbutton");
     buttonCircle.setAttributeNS(null, "transform", "scale(4)");

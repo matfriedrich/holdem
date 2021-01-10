@@ -54,15 +54,7 @@ button,
 #options {
   width: 100%;
   padding: 20px 20px;
-  background: #ba1fda;
-  text-align: center;
-  min-height: 100px;
-}
-
-#allinDrop {
-  width: 100%;
-  padding: 20px 20px;
-  background: #22eb8d;
+  background: #216e07;
   text-align: center;
   min-height: 100px;
 }
