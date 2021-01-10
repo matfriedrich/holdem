@@ -71,6 +71,10 @@ button,
   font-style: italic;
 }
 
+.text-sans {
+  font-family: sans-serif;
+}
+
 svg text.text-white,
 svg .fill-white {
   color: #fdf9ea;
@@ -107,6 +111,12 @@ rect.card-front {
   fill: #fdf9ea;
   stroke: #dc0000;
   stroke-width: 0.4%;
+}
+
+.dealerbutton {
+  fill: #fdf9ea;
+  stroke: black;
+  stroke-width: 0.04;
 }
 
 circle.pulse {

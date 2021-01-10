@@ -3,7 +3,7 @@ const xmlns = "http://www.w3.org/2000/svg";
 const cardHeight = 7,
   cardWidth = 4.8;
 
-function alignSvgObject(object) {
+function alignSvgObject(object, heightFactor = 1 / 2) {
   var bbox = object.getBBox();
   var width = bbox.width;
   var height = bbox.height;
@@ -11,7 +11,7 @@ function alignSvgObject(object) {
   object.setAttributeNS(
     null,
     "transform",
-    "translate(" + -width / 2 + " " + height / 2 + ")"
+    "translate(" + -width / 2 + " " + height * heightFactor + ")"
   );
 }
 
@@ -435,6 +435,9 @@ class Svg {
     }
 
     var ownPlayer = players[ownPlayerID];
+    if (ownPlayerID == pokertable.dealerId) {
+      this.appendDealerButton(this.playerSelfGroup);
+    }
     if (ownPlayer) {
       var p = new SelfPlayer(ownPlayer);
       p.appendCardGroup(this.playerSelfGroup);
@@ -493,6 +496,9 @@ class Svg {
         this.playerLeftGroup
       );
     }
+    if (otherPlayerId == pokertable.dealerId) {
+      this.appendDealerButton(this.playerLeftGroup);
+    }
 
     otherPlayerId = (ownPlayerID + 2) % 4;
     otherPlayer = players[otherPlayerId];
@@ -510,6 +516,9 @@ class Svg {
         this.playerTopGroup
       );
     }
+    if (otherPlayerId == pokertable.dealerId) {
+      this.appendDealerButton(this.playerTopGroup);
+    }
 
     otherPlayerId = (ownPlayerID + 3) % 4;
     otherPlayer = players[otherPlayerId];
@@ -526,6 +535,9 @@ class Svg {
         pokertable,
         this.playerRightGroup
       );
+    }
+    if (otherPlayerId == pokertable.dealerId) {
+      this.appendDealerButton(this.playerRightGroup);
     }
 
     this.updatePot(pokertable.pot);
@@ -710,5 +722,27 @@ class Svg {
     } else {
       this.appendWaitingText(parentNode);
     }
+  }
+
+  appendDealerButton(parentNode) {
+    var buttonGroup = document.createElementNS(xmlns, "g");
+    buttonGroup.setAttributeNS(
+      null,
+      "transform",
+      "scale(0.4) translate(10 15)"
+    );
+    var buttonCircle = this.createCircle();
+    buttonCircle.setAttributeNS(null, "class", "dealerbutton");
+    buttonCircle.setAttributeNS(null, "transform", "scale(4)");
+
+    var buttonTextNode = document.createElementNS(xmlns, "text");
+    buttonTextNode.setAttributeNS(null, "class", "text-sans");
+    var buttonTextNodeContent = document.createTextNode("DEALER");
+    buttonTextNode.append(buttonTextNodeContent);
+
+    buttonGroup.append(buttonCircle, buttonTextNode);
+    parentNode.append(buttonGroup);
+
+    alignSvgObject(buttonTextNode, 1 / 4);
   }
 }
