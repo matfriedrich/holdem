@@ -120,3 +120,29 @@ circle.pulse {
     r: 1.25;
   }
 }
+
+.fadeout {
+  animation: fadeout 1s forwards; /* forwards is needed to keep final state after animation finished */
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.fadein {
+  animation: fadein 1s forwards; /* forwards is needed to keep final state after animation finished */
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

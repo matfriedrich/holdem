@@ -305,11 +305,8 @@ class SelfPlayer extends SvgPlayer {
 class Svg {
   constructor(parent) {
     this.cardValueNodes = {};
-    this.flopNodes = [];
-    this.riverNode;
-    this.turnNode;
 
-    console.log("SVG");
+    console.log("SVG()");
     this.svg = document.createElementNS(xmlns, "svg");
     this.svg.id = "svgArea";
     this.svg.setAttribute("viewBox", "0 0 100 50");
@@ -369,6 +366,66 @@ class Svg {
     this.svg.append(this.boardGroup);
     this.boardGroup.id = "boardGroup";
     this.boardGroup.setAttributeNS(null, "transform", "translate(50 20)");
+
+    this.bubble = document.createElementNS(xmlns, "symbol");
+    this.bubbleId = "bubble";
+    this.bubble.id = this.bubbleId;
+    var bubblePath = document.createElementNS(xmlns, "path");
+    bubblePath.setAttributeNS(
+      null,
+      "d",
+      "M 46.411078,0.36542185 45.987746,0.55703416 36.344149,4.9287701 C 36.184307,4.8274962 36.022704,4.7271974 35.857506,4.6292884 32.062841,2.380237 26.854547,1.003104 21.105842,1.003104 c -5.748711,0 -10.95716,1.377133 -14.7518245,3.6261844 -3.7946718,2.2490536 -6.19842789,5.3980036 -6.19842789,8.9187956 0,3.52079 2.40375609,6.670203 6.19842789,8.919256 3.7946645,2.24905 9.0031135,3.625571 14.7518245,3.625571 5.748705,0 10.956999,-1.376521 14.751664,-3.625571 3.794671,-2.249053 6.198428,-5.398466 6.198428,-8.919256 0,-1.313168 -0.334768,-2.574501 -0.95099,-3.7567936 L 46.060888,0.96883829 Z M 45.027075,1.6169698 40.780263,8.9440177 40.382599,9.782224 c 0.124382,0.218142 0.238766,0.438888 0.341735,0.662114 l 0.0049,0.01644 0.0014,-0.0029 c 0.453895,0.988679 0.695767,2.024797 0.695767,3.090225 0,3.233838 -2.215548,6.199845 -5.889425,8.377303 -3.67387,2.177463 -8.783224,3.538601 -14.431135,3.538601 -5.647905,0 -10.756807,-1.361138 -14.4306763,-3.538601 -3.6738772,-2.177458 -5.89003782,-5.143465 -5.89003782,-8.377303 0,-3.23384 2.21616062,-6.1999965 5.89003782,-8.3774567 3.6738533,-2.1774105 8.7827543,-3.5379361 14.4306593,-3.5379361 5.647911,0 10.757265,1.3605256 14.431135,3.5379836 0.233926,0.1386434 0.459906,0.2814946 0.681784,0.4264034 l 0.691774,-0.2956389 c -0.0014,-0.0011 -0.0027,-0.00215 -0.0049,-0.00328 z"
+    );
+    var bubbleFill = document.createElementNS(xmlns, "path");
+    bubbleFill.setAttributeNS(
+      null,
+      "d",
+      "M 45.552845,1.1952874 36.28103,5.199344 c 0,0 -7.709371,-4.98153015 -17.651104,-3.681343 C 8.6881931,2.8181879 3.6544153,4.2326691 0.47544381,12.76642 -1.7938175,18.858111 12.464619,27.383552 23.152972,25.757751 c 7.313531,-1.112458 8.87776,-0.594904 16.444422,-6.613389 3.650524,-2.903608 1.16596,-9.3644266 1.16596,-9.3644266 z"
+    );
+    bubbleFill.setAttributeNS(null, "fill", "#fff");
+
+    this.bubble.append(bubbleFill, bubblePath);
+    this.svg.append(this.bubble);
+
+    //define Player Notification Positions
+    this.playerTopBubbleGroup = document.createElementNS(xmlns, "g");
+    this.playerTopBubbleGroup.id = "playerTopBubbleGroup";
+    this.playerTopBubbleGroup.setAttributeNS(
+      null,
+      "transform",
+      "translate(55 3)"
+    );
+
+    this.playerLeftBubbleGroup = document.createElementNS(xmlns, "g");
+    this.playerLeftBubbleGroup.id = "playerLeftBubbleGroup";
+    this.playerLeftBubbleGroup.setAttributeNS(
+      null,
+      "transform",
+      "translate(15 8)"
+    );
+
+    this.playerRightBubbleGroup = document.createElementNS(xmlns, "g");
+    this.playerRightBubbleGroup.id = "playerRightBubbleGroup";
+    this.playerRightBubbleGroup.setAttributeNS(
+      null,
+      "transform",
+      "translate(85 22)"
+    );
+
+    this.playerSelfBubbleGroup = document.createElementNS(xmlns, "g");
+    this.playerSelfBubbleGroup.id = "playerSelfBubbleGroup";
+    this.playerSelfBubbleGroup.setAttributeNS(
+      null,
+      "transform",
+      "translate(55 35)"
+    );
+
+    this.svg.append(
+      this.playerTopBubbleGroup,
+      this.playerLeftBubbleGroup,
+      this.playerRightBubbleGroup,
+      this.playerSelfBubbleGroup
+    );
   }
 
   createCircle(cx = 0, cy = 0, r = 1) {
@@ -422,6 +479,48 @@ class Svg {
     }
   }
 
+  startNotification(notification, parentNode, rotation = 0) {
+    var bubbleGroup = document.createElementNS(xmlns, "g"); //make group to apply rotation
+    bubbleGroup.setAttributeNS(null, "transform", "rotate(" + rotation + ")");
+    var bubble = document.createElementNS(xmlns, "use");
+    bubble.setAttributeNS(null, "href", "#" + this.bubbleId);
+    bubble.setAttributeNS(null, "transform", "scale(0.25)"); //scale inner object, because it's easiest if rotation has center anchor and scaling top left
+    bubbleGroup.append(bubble);
+
+    var textNode = document.createElementNS(xmlns, "text");
+    var textNodeContent = document.createTextNode(notification);
+    textNode.setAttributeNS(null, "class", "small");
+    textNode.setAttributeNS(null, "transform", "translate(3.5 3.5)");
+    textNode.append(textNodeContent);
+
+    parentNode.append(bubbleGroup, textNode);
+
+    var textNodeBBox = textNode.getBBox();
+    var bubbleBBox = bubbleGroup.getBBox();
+    textNode.setAttributeNS(
+      null,
+      "transform",
+      "translate(" +
+        (bubbleBBox.width / 2 - textNodeBBox.width / 2) +
+        " " +
+        bubbleBBox.height / 2 +
+        ")"
+    );
+
+    //fade in after the node has been set up
+    parentNode.setAttributeNS(null, "class", "fadein");
+
+    setTimeout(function () {
+      parentNode.setAttributeNS(null, "class", "fadeout");
+
+      setTimeout(function () {
+        // after 3s the objects have surely faded out already
+        parentNode.removeChild(bubbleGroup);
+        parentNode.removeChild(textNode);
+      }, 3000);
+    }, 7000);
+  }
+
   drawTable(pokertable) {
     console.log("SVG.drawTable()");
     console.log("pokertable: ", pokertable);
@@ -434,9 +533,26 @@ class Svg {
       players[player.id] = player;
     }
 
+    var smallBlindId = (pokertable.dealerId + 1) % 4;
+    var bigBlindId = (pokertable.dealerId + 2) % 4;
+
     var ownPlayer = players[ownPlayerID];
     if (ownPlayerID == pokertable.dealerId) {
       this.appendDealerButton(this.playerSelfGroup);
+    } else if (ownPlayer && pokertable.lastAction == "New Round") {
+      if (ownPlayerID == smallBlindId) {
+        this.startNotification(
+          "Small blind $ " + ownPlayer.bet,
+          this.playerSelfBubbleGroup,
+          180
+        );
+      } else if (ownPlayerID == bigBlindId) {
+        this.startNotification(
+          "Big blind $ " + ownPlayer.bet,
+          this.playerSelfBubbleGroup,
+          180
+        );
+      }
     }
     if (ownPlayer) {
       var p = new SelfPlayer(ownPlayer);
@@ -498,6 +614,20 @@ class Svg {
     }
     if (otherPlayerId == pokertable.dealerId) {
       this.appendDealerButton(this.playerLeftGroup);
+    } else if (otherPlayer && pokertable.lastAction == "New Round") {
+      if (otherPlayerId == smallBlindId) {
+        this.startNotification(
+          "Small blind $ " + otherPlayer.bet,
+          this.playerLeftBubbleGroup,
+          180
+        );
+      } else if (otherPlayerId == bigBlindId) {
+        this.startNotification(
+          "Big blind $ " + otherPlayer.bet,
+          this.playerLeftBubbleGroup,
+          180
+        );
+      }
     }
 
     otherPlayerId = (ownPlayerID + 2) % 4;
@@ -518,6 +648,21 @@ class Svg {
     }
     if (otherPlayerId == pokertable.dealerId) {
       this.appendDealerButton(this.playerTopGroup);
+    } else if (otherPlayer && pokertable.lastAction == "New Round") {
+      var text = "";
+      if (otherPlayerId == smallBlindId) {
+        this.startNotification(
+          "Small blind $ " + otherPlayer.bet,
+          this.playerTopBubbleGroup,
+          180
+        );
+      } else if (otherPlayerId == bigBlindId) {
+        this.startNotification(
+          "Big blind $ " + otherPlayer.bet,
+          this.playerTopBubbleGroup,
+          180
+        );
+      }
     }
 
     otherPlayerId = (ownPlayerID + 3) % 4;
@@ -538,6 +683,18 @@ class Svg {
     }
     if (otherPlayerId == pokertable.dealerId) {
       this.appendDealerButton(this.playerRightGroup);
+    } else if (otherPlayer && pokertable.lastAction == "New Round") {
+      if (otherPlayerId == smallBlindId) {
+        this.startNotification(
+          "Small blind $ " + otherPlayer.bet,
+          this.playerRightBubbleGroup
+        );
+      } else if (otherPlayerId == bigBlindId) {
+        this.startNotification(
+          "Big blind $ " + otherPlayer.bet,
+          this.playerRightBubbleGroup
+        );
+      }
     }
 
     this.updatePot(pokertable.pot);
