@@ -3,6 +3,8 @@ const xmlns = "http://www.w3.org/2000/svg";
 const cardHeight = 7,
   cardWidth = 4.8;
 
+const dealerButtonId = "dealerbutton";
+
 function alignSvgObject(object, heightFactor = 1 / 2) {
   var bbox = object.getBBox();
   var width = bbox.width;
@@ -18,6 +20,7 @@ function alignSvgObject(object, heightFactor = 1 / 2) {
 class SvgPlayer {
   constructor(player) {
     if (player) {
+      this.id = player.id;
       this.name = player.username;
       this.balance = player.balance;
       this.isactive = player.isactive;
@@ -437,12 +440,18 @@ class Svg {
     return circle;
   }
 
+  createTextNode(text) {
+    var textNode = document.createElementNS(xmlns, "text");
+    var content = document.createTextNode(text);
+    textNode.append(content);
+
+    return textNode;
+  }
+
   appendWaitingText(parent) {
     var group = document.createElementNS(xmlns, "g");
-    var element = document.createElementNS(xmlns, "text");
+    var element = this.createTextNode("Waiting for player");
     element.classList.add("text-white");
-    var nameNode = document.createTextNode("Waiting for player");
-    element.appendChild(nameNode);
     group.append(element);
     parent.append(group);
 
@@ -487,11 +496,9 @@ class Svg {
     bubble.setAttributeNS(null, "transform", "scale(0.25)"); //scale inner object, because it's easiest if rotation has center anchor and scaling top left
     bubbleGroup.append(bubble);
 
-    var textNode = document.createElementNS(xmlns, "text");
-    var textNodeContent = document.createTextNode(notification);
+    var textNode = this.createTextNode(notification);
     textNode.setAttributeNS(null, "class", "small");
     textNode.setAttributeNS(null, "transform", "translate(3.5 3.5)");
-    textNode.append(textNodeContent);
 
     parentNode.append(bubbleGroup, textNode);
 
@@ -533,77 +540,33 @@ class Svg {
       players[player.id] = player;
     }
 
-    var smallBlindId = (pokertable.dealerId + 1) % 4;
-    var bigBlindId = (pokertable.dealerId + 2) % 4;
-
+    /*
+     * Handle Own (Bottom) Player *
+     **/
     var ownPlayer = players[ownPlayerID];
-    if (ownPlayerID == pokertable.dealerId) {
-      this.appendDealerButton(this.playerSelfGroup);
-    } else if (ownPlayer && pokertable.lastAction == "New Round") {
-      if (ownPlayerID == smallBlindId) {
-        this.startNotification(
-          "Small blind $ " + ownPlayer.bet,
-          this.playerSelfBubbleGroup,
-          180
-        );
-      } else if (ownPlayerID == bigBlindId) {
-        this.startNotification(
-          "Big blind $ " + ownPlayer.bet,
-          this.playerSelfBubbleGroup,
-          180
-        );
-      }
-    }
     if (ownPlayer) {
       var p = new SelfPlayer(ownPlayer);
-      p.appendCardGroup(this.playerSelfGroup);
+      this.dealCards(p, pokertable, this.playerSelfGroup);
       p.appendDetails(this.playerSelfGroup);
     } else {
-      for (let playerLost of pokertable.playersLost) {
-        //if you have lost
-        if (playerLost.id == ownPlayerID) {
-          var oopsGroup = document.createElementNS(xmlns, "g");
-          var oopsTextNode = document.createElementNS(xmlns, "text");
-          oopsTextNode.setAttributeNS(null, "class", "fill-white");
-          oopsTextNode.setAttributeNS(null, "transform", "scale(1.8)");
-          var oopsTextContent = document.createTextNode("Woah,");
-
-          oopsTextNode.appendChild(oopsTextContent);
-          oopsGroup.appendChild(oopsTextNode);
-          this.playerSelfGroup.appendChild(oopsGroup);
-          alignSvgObject(oopsGroup);
-
-          var youLostGroup = document.createElementNS(xmlns, "g");
-          var youLostTextNode = document.createElementNS(xmlns, "text");
-          youLostTextNode.setAttributeNS(null, "class", "fill-white");
-          var youLostTextContent = document.createTextNode(
-            "You've lost all your money, Cowboy!"
-          );
-          youLostTextNode.appendChild(youLostTextContent);
-          youLostGroup.appendChild(youLostTextNode);
-          this.playerSelfGroup.appendChild(youLostGroup);
-          alignSvgObject(youLostTextNode);
-
-          var oopsGroupBBox = oopsGroup.getBBox();
-          var oopsGroupWidth = oopsGroupBBox.width,
-            oopsGroupHeight = oopsGroupBBox.height;
-          youLostGroup.setAttributeNS(
-            null,
-            "transform",
-            "translate( 0 " + oopsGroupHeight + ")"
-          );
-        }
-      }
+      //if player isn't in current players array
+      this.checkPlayerSelfLost(pokertable);
     }
 
+    if (ownPlayerID == pokertable.dealerId) {
+      this.appendDealerButton(this.playerSelfGroup);
+    } else {
+      this.checkBlinds(pokertable, ownPlayer, this.playerSelfBubbleGroup, 180);
+    }
+
+    /*
+     * LEFT PLAYER *
+     ***/
     var otherPlayerId = (ownPlayerID + 1) % 4;
     var otherPlayer = players[otherPlayerId];
     if (otherPlayer) {
-      //left player
       var p = new OtherPlayer(otherPlayer);
-      if (otherPlayer.card0 && otherPlayer.card1) {
-        p.appendCardGroup(this.playerLeftGroup);
-      }
+      this.dealCards(p, pokertable, this.playerLeftGroup);
       p.appendDetails(this.playerLeftGroup);
     } else {
       this.handleOtherPlayerLostOrWaiting(
@@ -612,32 +575,26 @@ class Svg {
         this.playerLeftGroup
       );
     }
+
     if (otherPlayerId == pokertable.dealerId) {
       this.appendDealerButton(this.playerLeftGroup);
-    } else if (otherPlayer && pokertable.lastAction == "New Round") {
-      if (otherPlayerId == smallBlindId) {
-        this.startNotification(
-          "Small blind $ " + otherPlayer.bet,
-          this.playerLeftBubbleGroup,
-          180
-        );
-      } else if (otherPlayerId == bigBlindId) {
-        this.startNotification(
-          "Big blind $ " + otherPlayer.bet,
-          this.playerLeftBubbleGroup,
-          180
-        );
-      }
+    } else {
+      this.checkBlinds(
+        pokertable,
+        otherPlayer,
+        this.playerLeftBubbleGroup,
+        180
+      );
     }
 
+    /*
+     * TOP PLAYER *
+     ***/
     otherPlayerId = (ownPlayerID + 2) % 4;
     otherPlayer = players[otherPlayerId];
     if (otherPlayer) {
-      //top player
       var p = new OtherPlayer(otherPlayer);
-      if (otherPlayer.card0 && otherPlayer.card1) {
-        p.appendCardGroup(this.playerTopGroup);
-      }
+      this.dealCards(p, pokertable, this.playerTopGroup);
       p.appendDetails(this.playerTopGroup);
     } else {
       this.handleOtherPlayerLostOrWaiting(
@@ -646,33 +603,21 @@ class Svg {
         this.playerTopGroup
       );
     }
+
     if (otherPlayerId == pokertable.dealerId) {
       this.appendDealerButton(this.playerTopGroup);
-    } else if (otherPlayer && pokertable.lastAction == "New Round") {
-      var text = "";
-      if (otherPlayerId == smallBlindId) {
-        this.startNotification(
-          "Small blind $ " + otherPlayer.bet,
-          this.playerTopBubbleGroup,
-          180
-        );
-      } else if (otherPlayerId == bigBlindId) {
-        this.startNotification(
-          "Big blind $ " + otherPlayer.bet,
-          this.playerTopBubbleGroup,
-          180
-        );
-      }
+    } else {
+      this.checkBlinds(pokertable, otherPlayer, this.playerTopBubbleGroup, 180);
     }
 
+    /*
+     * RIGHT PLAYER *
+     ***/
     otherPlayerId = (ownPlayerID + 3) % 4;
     otherPlayer = players[otherPlayerId];
     if (otherPlayer) {
-      //right player
       var p = new OtherPlayer(otherPlayer);
-      if (otherPlayer.card0 && otherPlayer.card1) {
-        p.appendCardGroup(this.playerRightGroup);
-      }
+      this.dealCards(p, pokertable, this.playerRightGroup);
       p.appendDetails(this.playerRightGroup);
     } else {
       this.handleOtherPlayerLostOrWaiting(
@@ -681,20 +626,11 @@ class Svg {
         this.playerRightGroup
       );
     }
+
     if (otherPlayerId == pokertable.dealerId) {
       this.appendDealerButton(this.playerRightGroup);
-    } else if (otherPlayer && pokertable.lastAction == "New Round") {
-      if (otherPlayerId == smallBlindId) {
-        this.startNotification(
-          "Small blind $ " + otherPlayer.bet,
-          this.playerRightBubbleGroup
-        );
-      } else if (otherPlayerId == bigBlindId) {
-        this.startNotification(
-          "Big blind $ " + otherPlayer.bet,
-          this.playerRightBubbleGroup
-        );
-      }
+    } else {
+      this.checkBlinds(pokertable, otherPlayer, this.playerRightBubbleGroup);
     }
 
     this.updatePot(pokertable.pot);
@@ -722,8 +658,8 @@ class Svg {
   updateBoard(flop, turn, river) {
     console.log("SVG.updateBoard()");
 
+    //reset Board
     while (this.boardGroup.firstChild) {
-      //reset Board
       this.boardGroup.removeChild(this.boardGroup.firstChild);
     }
     this.cardValueNodes = []; //reset the value nodes that can be copied once created
@@ -814,11 +750,9 @@ class Svg {
         cardValueSvg.setAttributeNS(null, "href", "#cardValue" + coloredValue);
         cardGroup.appendChild(cardValueSvg);
       } else {
-        cardValueSvg = document.createElementNS(xmlns, "text");
+        cardValueSvg = this.createTextNode(card.value);
         cardValueSvg.id = "cardValue" + coloredValue;
-        var cardValueSvgText = document.createTextNode(card.value);
         cardValueSvg.setAttributeNS(null, "transform", "translate(.6 1.6)");
-        cardValueSvg.appendChild(cardValueSvgText);
         cardGroup.appendChild(cardValueSvg);
 
         this.cardValueNodes[coloredValue] = cardValueSvg;
@@ -854,13 +788,11 @@ class Svg {
   }
 
   getOtherPlayerLostText(player) {
-    var oopsTextNode = document.createElementNS(xmlns, "text");
-    oopsTextNode.setAttributeNS(null, "class", "fill-white");
-    var oopsTextContent = document.createTextNode(
+    var oopsTextNode = this.createTextNode(
       player.username + " lost all their money!"
     );
+    oopsTextNode.setAttributeNS(null, "class", "fill-white");
 
-    oopsTextNode.appendChild(oopsTextContent);
     return oopsTextNode;
   }
 
@@ -888,14 +820,97 @@ class Svg {
     buttonCircle.setAttributeNS(null, "class", "dealerbutton");
     buttonCircle.setAttributeNS(null, "transform", "scale(4)");
 
-    var buttonTextNode = document.createElementNS(xmlns, "text");
+    var buttonTextNode = this.createTextNode("DEALER");
     buttonTextNode.setAttributeNS(null, "class", "text-sans");
-    var buttonTextNodeContent = document.createTextNode("DEALER");
-    buttonTextNode.append(buttonTextNodeContent);
 
     buttonGroup.append(buttonCircle, buttonTextNode);
+    buttonGroup.id = dealerButtonId;
     parentNode.append(buttonGroup);
 
     alignSvgObject(buttonTextNode, 1 / 4);
+  }
+
+  checkPlayerSelfLost(pokertable) {
+    for (let playerLost of pokertable.playersLost) {
+      if (playerLost.id == pokertable.playerId) {
+        var oopsGroup = document.createElementNS(xmlns, "g");
+        var oopsTextNode = this.createTextNode("Woah,");
+        oopsTextNode.setAttributeNS(null, "class", "fill-white");
+        oopsTextNode.setAttributeNS(null, "transform", "scale(1.8)");
+
+        oopsGroup.appendChild(oopsTextNode);
+        this.playerSelfGroup.appendChild(oopsGroup);
+        alignSvgObject(oopsGroup);
+
+        var youLostGroup = document.createElementNS(xmlns, "g");
+        var youLostTextNode = this.createTextNode(
+          "You've lost all your money, Cowboy!"
+        );
+        youLostTextNode.setAttributeNS(null, "class", "fill-white");
+        youLostGroup.appendChild(youLostTextNode);
+        this.playerSelfGroup.appendChild(youLostGroup);
+        alignSvgObject(youLostTextNode);
+
+        var oopsGroupBBox = oopsGroup.getBBox();
+        var oopsGroupHeight = oopsGroupBBox.height;
+        youLostGroup.setAttributeNS(
+          null,
+          "transform",
+          "translate( 0 " + oopsGroupHeight + ")"
+        );
+      }
+    }
+  }
+
+  checkBlinds(pokertable, player, notificationGroupNode, bubbleRotation) {
+    var smallBlindId = (pokertable.dealerId + 1) % 4;
+    var bigBlindId = (pokertable.dealerId + 2) % 4;
+
+    if (player && pokertable.lastAction == "New Round") {
+      if (player.id == smallBlindId) {
+        this.startNotification(
+          "Small blind $ " + player.bet,
+          notificationGroupNode,
+          bubbleRotation
+        );
+      } else if (player.id == bigBlindId) {
+        this.startNotification(
+          "Big blind $ " + player.bet,
+          notificationGroupNode,
+          bubbleRotation
+        );
+      }
+    }
+  }
+
+  dealCards(svgPlayer, pokertable, playerGroupNode) {
+    if (pokertable.lastAction) {
+      //if New Round, delay Display of Cards until Blinds have been set
+      if (pokertable.lastAction == "New Round") {
+        var position = svgPlayer.id - pokertable.dealerId; //this is the formula to determine at what position the player get's his cards dealt
+        if (svgPlayer.id <= pokertable.dealerId) {
+          position = 4 + position;
+        }
+        setTimeout(
+          function (parent, p) {
+            var dealerButton = null;
+            while (parent.firstChild) {
+              if (parent.firstChild.id == dealerButtonId) {
+                dealerButton = parent.firstChild;
+              }
+              parent.removeChild(parent.firstChild);
+            }
+            p.appendCardGroup(parent);
+            p.appendDetails(parent);
+            parent.appendChild(dealerButton);
+          },
+          2000 + 1000 * (position - 1),
+          playerGroupNode,
+          svgPlayer
+        );
+      } else {
+        svgPlayer.appendCardGroup(playerGroupNode);
+      }
+    }
   }
 }
