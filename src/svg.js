@@ -902,7 +902,10 @@ class Svg {
             }
             p.appendCardGroup(parent);
             p.appendDetails(parent);
-            parent.appendChild(dealerButton);
+            console.log(dealerButton);
+            if (dealerButton) {
+              parent.appendChild(dealerButton);
+            }
           },
           2000 + 1000 * (position - 1),
           playerGroupNode,
