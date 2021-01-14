@@ -902,7 +902,6 @@ class Svg {
             }
             p.appendCardGroup(parent);
             p.appendDetails(parent);
-            console.log(dealerButton);
             if (dealerButton) {
               parent.appendChild(dealerButton);
             }
