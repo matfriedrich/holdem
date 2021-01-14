@@ -1,6 +1,7 @@
 const GAMES_TOTAL = "games_total";
 const GAMES_WON = "games_won";
-
+const PLAYER_ID = "user_id";
+const PLAYER_NAME = "player_name"
 class Model {
   /**
    * Creates a new Model Object
@@ -92,6 +93,39 @@ class Model {
     statistics.push(gamesWon);
 
     return statistics;
+  }
+
+  /**
+   * Store current session in local storage to be able to rejoin a game
+   * @param {string} playerName
+   * @param {integer} playerId
+   */
+
+  storePlayerSession(playerName, playerId) {
+    sessionStorage.setItem(PLAYER_ID, playerId);
+    sessionStorage.setItem(PLAYER_NAME, playerName);
+    return;
+  }
+
+  /**
+   * retrieve player object from session storage for rejoining
+   * @returns {null|{name: string, id: string}}
+   */
+  retrievePlayerSession() {
+    var id = sessionStorage.getItem(PLAYER_ID);
+    var name = sessionStorage.getItem(PLAYER_NAME);
+
+    if (id == undefined ||name == undefined) return null;
+
+    return {id: id, name: name};
+  }
+
+  /**
+   * delete player object from session storage after game is over
+   */
+  deletePlayerSession() {
+    sessionStorage.removeItem(PLAYER_ID);
+    sessionStorage.removeItem(PLAYER_NAME);
   }
 
   /**
