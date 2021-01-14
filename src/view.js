@@ -204,6 +204,7 @@ class View {
     console.log("View. updateTable()");
 
     this.svg.drawTable(pokertable);
+    this.svg.showLastAction(pokertable);
 
     while (this.options.firstChild) {
       this.options.removeChild(this.options.firstChild);

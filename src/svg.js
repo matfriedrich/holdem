@@ -551,6 +551,7 @@ class Svg {
   }
 
   startNotification(notification, parentNode, rotation = 0) {
+    console.log("Start Bubble: " + notification);
     var bubbleGroup = document.createElementNS(xmlns, "g"); //make group to apply rotation
     bubbleGroup.setAttributeNS(null, "transform", "rotate(" + rotation + ")");
     var bubble = document.createElementNS(xmlns, "use");
@@ -901,7 +902,11 @@ class Svg {
 
   appendDealerButton(parentNode) {
     var buttonGroup = document.createElementNS(xmlns, "g");
-    buttonGroup.setAttributeNS(null, "transform", "scale(0.4) translate(18 2)");
+    buttonGroup.setAttributeNS(
+      null,
+      "transform",
+      "scale(0.4) translate(-18 2)"
+    );
     var buttonCircle = this.createCircle();
     buttonCircle.setAttributeNS(null, "class", "dealerbutton");
     buttonCircle.setAttributeNS(null, "transform", "scale(4)");
@@ -1015,6 +1020,41 @@ class Svg {
       activeIndicator.setAttributeNS(null, "class", "scale-pulse");
 
       parentNode.append(activeIndicator);
+    }
+  }
+
+  showLastAction(pokertable) {
+    var lastPlayer = null;
+    for (let player of pokertable.players) {
+      if (pokertable.lastAction.player == player.id) {
+        lastPlayer = player;
+      }
+    }
+
+    if (lastPlayer) {
+      var lastActionString = pokertable.lastAction.action;
+
+      var parentNode = null;
+      var bubbleRotation = 180;
+      switch (lastPlayer.id) {
+        case pokertable.playerId:
+          parentNode = this.playerSelfBubbleGroup;
+          break;
+        case (pokertable.playerId + 1) % 4:
+          parentNode = this.playerLeftBubbleGroup;
+          break;
+        case (pokertable.playerId + 2) % 4:
+          parentNode = this.playerTopBubbleGroup;
+          break;
+        case (pokertable.playerId + 3) % 4:
+          parentNode = this.playerRightBubbleGroup;
+          bubbleRotation = 0;
+          break;
+      }
+
+      if (parentNode) {
+        this.startNotification(lastActionString, parentNode, bubbleRotation);
+      }
     }
   }
 }
