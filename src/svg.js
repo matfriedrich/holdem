@@ -316,6 +316,58 @@ class Svg {
 
     parent.append(this.svg);
 
+    //defs
+    var defs = document.createElementNS(xmlns, "defs");
+    this.svg.append(defs);
+
+    var filter = document.createElementNS(xmlns, "filter");
+    filter.id = "blurFilter";
+    var gaussian = document.createElementNS(xmlns, "feGaussianBlur");
+    gaussian.setAttributeNS(null, "in", "SourceGraphic");
+    gaussian.setAttributeNS(null, "stdDeviation", 0.35);
+    filter.appendChild(gaussian);
+    defs.appendChild(filter);
+
+    //define Player IsActiveIndicators Positions
+    this.playerTopIsActiveIndicator = document.createElementNS(xmlns, "g");
+    this.playerTopIsActiveIndicator.id = "playerTopIsActiveIndicator";
+    this.playerTopIsActiveIndicator.setAttributeNS(
+      null,
+      "transform",
+      "translate(50 8)"
+    );
+
+    this.playerLeftIsActiveIndicator = document.createElementNS(xmlns, "g");
+    this.playerLeftIsActiveIndicator.id = "playerLeftIsActiveIndicator";
+    this.playerLeftIsActiveIndicator.setAttributeNS(
+      null,
+      "transform",
+      "translate(10 18)"
+    );
+
+    this.playerRightIsActiveIndicator = document.createElementNS(xmlns, "g");
+    this.playerRightIsActiveIndicator.id = "playerRightIsActiveIndicator";
+    this.playerRightIsActiveIndicator.setAttributeNS(
+      null,
+      "transform",
+      "translate(90 18)"
+    );
+
+    this.playerSelfIsActiveIndicator = document.createElementNS(xmlns, "g");
+    this.playerSelfIsActiveIndicator.id = "playerSelfIsActiveIndicator";
+    this.playerSelfIsActiveIndicator.setAttributeNS(
+      null,
+      "transform",
+      "translate(50 43)"
+    );
+
+    this.svg.append(
+      this.playerTopIsActiveIndicator,
+      this.playerLeftIsActiveIndicator,
+      this.playerRightIsActiveIndicator,
+      this.playerSelfIsActiveIndicator
+    );
+
     //define Player Positions
     this.playerTopGroup = document.createElementNS(xmlns, "g");
     this.playerTopGroup.id = "playerTop";
@@ -440,6 +492,16 @@ class Svg {
     return circle;
   }
 
+  createEllipse(cx = 0, cy = 0, rx = 2, ry = 1) {
+    var ellipse = document.createElementNS(xmlns, "ellipse");
+    ellipse.setAttributeNS(null, "cx", cx);
+    ellipse.setAttributeNS(null, "cy", cy);
+    ellipse.setAttributeNS(null, "rx", rx);
+    ellipse.setAttributeNS(null, "ry", ry);
+
+    return ellipse;
+  }
+
   createTextNode(text) {
     var textNode = document.createElementNS(xmlns, "text");
     var content = document.createTextNode(text);
@@ -548,6 +610,12 @@ class Svg {
       var p = new SelfPlayer(ownPlayer);
       this.dealCards(p, pokertable, this.playerSelfGroup);
       p.appendDetails(this.playerSelfGroup);
+
+      this.indicateIsActive(
+        ownPlayerID,
+        pokertable,
+        this.playerSelfIsActiveIndicator
+      );
     } else {
       //if player isn't in current players array
       this.checkPlayerSelfLost(pokertable);
@@ -568,6 +636,12 @@ class Svg {
       var p = new OtherPlayer(otherPlayer);
       this.dealCards(p, pokertable, this.playerLeftGroup);
       p.appendDetails(this.playerLeftGroup);
+
+      this.indicateIsActive(
+        otherPlayerId,
+        pokertable,
+        this.playerLeftIsActiveIndicator
+      );
     } else {
       this.handleOtherPlayerLostOrWaiting(
         otherPlayerId,
@@ -596,6 +670,12 @@ class Svg {
       var p = new OtherPlayer(otherPlayer);
       this.dealCards(p, pokertable, this.playerTopGroup);
       p.appendDetails(this.playerTopGroup);
+
+      this.indicateIsActive(
+        otherPlayerId,
+        pokertable,
+        this.playerTopIsActiveIndicator
+      );
     } else {
       this.handleOtherPlayerLostOrWaiting(
         otherPlayerId,
@@ -619,6 +699,12 @@ class Svg {
       var p = new OtherPlayer(otherPlayer);
       this.dealCards(p, pokertable, this.playerRightGroup);
       p.appendDetails(this.playerRightGroup);
+
+      this.indicateIsActive(
+        otherPlayerId,
+        pokertable,
+        this.playerRightIsActiveIndicator
+      );
     } else {
       this.handleOtherPlayerLostOrWaiting(
         otherPlayerId,
@@ -913,6 +999,22 @@ class Svg {
       } else {
         svgPlayer.appendCardGroup(playerGroupNode);
       }
+    }
+  }
+
+  indicateIsActive(playerId, pokertable, parentNode) {
+    while (parentNode.firstChild) {
+      parentNode.removeChild(parentNode.firstChild);
+    }
+
+    if (playerId == pokertable.activePlayer) {
+      var activeIndicator = this.createEllipse(0, 0, 8, 2.5);
+      activeIndicator.setAttributeNS(null, "filter", "url(#blurFilter)");
+      activeIndicator.setAttributeNS(null, "fill", "#12de12");
+      activeIndicator.setAttributeNS(null, "opacity", 0.5);
+      activeIndicator.setAttributeNS(null, "class", "scale-pulse");
+
+      parentNode.append(activeIndicator);
     }
   }
 }
