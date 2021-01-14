@@ -188,8 +188,9 @@ let c = new Controller();
 
 const testObject = { username: "testuser", ip: "192.168.0.1" };
 
-let connection = new WebSocket("ws://localhost:8080", ["soap", "xmpp"]);
+let baseUrl = window.location.host.split(':')[0];
 
+let connection = new WebSocket("ws://" + baseUrl + ":8080", ["soap", "xmpp"]);
 /**
  * When the connection is open, send some data to the server
  */
