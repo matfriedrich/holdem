@@ -22,9 +22,19 @@ class Controller {
    * sendJoin("john doe")
    */
   sendJoin = (username) => {
-    const message = { type: "join", name: username };
+    const message = { type: "join", name: username};
     sendMessage(message);
   };
+
+  /**
+   * Send rejoin message
+   * (same as join, but with existing session -> including plaer id
+   *
+   */
+  sendRejoin = (session) => {
+    const message = { type: "join", name: session.name, id: session.id };
+    sendMessage(message);
+  }
 
   /**
    * Send action message
@@ -93,6 +103,7 @@ class Controller {
     }
 
     this.model.setPlayerId(msg.player.id);
+    this.model.storePlayerSession(msg.player.username, msg.player.id);
     this.model.setPlayers(msg.existingplayers);
     console.log("Player " + msg.player.username + " has joined");
 
@@ -128,6 +139,8 @@ class Controller {
       this.model.storeResult(false);
       alert("Player " + msg.winner + " has won");
     }
+
+    this.model.deletePlayerSession();
 
     setTimeout(function () {
       location.reload();
@@ -182,6 +195,10 @@ let connection = new WebSocket("ws://localhost:8080", ["soap", "xmpp"]);
  */
 connection.onopen = function () {
   connection.send(JSON.stringify(testObject)); // Send the message 'Ping' to the server
+
+  // if there is a previous session: rejoin
+  var savedPlayerSession = c.model.retrievePlayerSession();
+  if (savedPlayerSession !== null) c.sendRejoin(savedPlayerSession)
 };
 
 /**

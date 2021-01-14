@@ -64,7 +64,10 @@ class PokerTable {
     this.connections.push(ws)
   }
 
-  addPlayer(username) {
+  addPlayer(username, id) {
+    var player = this.players.find(player => player.id == id)
+    if(player !== undefined) return true
+
     var newPlayer
     if (this.players.length + this.playersLost.length >= 4) {
       return false
