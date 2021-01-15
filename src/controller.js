@@ -22,7 +22,7 @@ class Controller {
    * sendJoin("john doe")
    */
   sendJoin = (username) => {
-    const message = { type: "join", name: username};
+    const message = { type: "join", name: username };
     sendMessage(message);
   };
 
@@ -34,7 +34,7 @@ class Controller {
   sendRejoin = (session) => {
     const message = { type: "join", name: session.name, id: session.id };
     sendMessage(message);
-  }
+  };
 
   /**
    * Send action message
@@ -144,7 +144,7 @@ class Controller {
 
     setTimeout(function () {
       location.reload();
-    }, 3000);
+    }, 7000); //if game is won, make timeout on clientside so that the server starts a new game in the meantime
   }
 
   /**
@@ -188,7 +188,7 @@ let c = new Controller();
 
 const testObject = { username: "testuser", ip: "192.168.0.1" };
 
-let baseUrl = window.location.host.split(':')[0];
+let baseUrl = window.location.host.split(":")[0];
 
 let connection = new WebSocket("ws://" + baseUrl + ":8080", ["soap", "xmpp"]);
 /**
@@ -199,7 +199,7 @@ connection.onopen = function () {
 
   // if there is a previous session: rejoin
   var savedPlayerSession = c.model.retrievePlayerSession();
-  if (savedPlayerSession !== null) c.sendRejoin(savedPlayerSession)
+  if (savedPlayerSession !== null) c.sendRejoin(savedPlayerSession);
 };
 
 /**

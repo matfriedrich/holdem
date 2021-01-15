@@ -96,7 +96,7 @@ function handleMessage(ws, message) {
           pokerTable.connections.forEach(function each(player) {
             player.send(JSON.stringify(payload));
           });
-        }, 7000);
+        }, 7000); //if round ends, make timeout here so that the new message that forces the client to update isn't sent too early
       }
       if (pokerTable.players.length === 1) {
         // player has won
@@ -108,9 +108,7 @@ function handleMessage(ws, message) {
           player.send(JSON.stringify(message));
         });
 
-        setTimeout(function () {
-          pokerTable = new PokerTable();
-        }, 7000);
+        pokerTable = new PokerTable();
       }
       break;
   }
