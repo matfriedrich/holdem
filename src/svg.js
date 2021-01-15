@@ -551,7 +551,6 @@ class Svg {
   }
 
   startNotification(notification, parentNode, rotation = 0) {
-    console.log("Start Bubble: " + notification);
     var bubbleGroup = document.createElementNS(xmlns, "g"); //make group to apply rotation
     bubbleGroup.setAttributeNS(null, "transform", "rotate(" + rotation + ")");
     var bubble = document.createElementNS(xmlns, "use");
