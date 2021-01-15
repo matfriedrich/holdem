@@ -46,7 +46,7 @@ wss.on("connection", function connection(ws) {
   })
 })
 
-server.listen(webserverPort, hostname, () => {
+server.listen(webserverPort, () => {
   console.log(`Server running at http://${hostname}:${webserverPort}/`)
 })
 
