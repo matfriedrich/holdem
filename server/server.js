@@ -1,19 +1,20 @@
-const http = require("http")
-var node_static = require("node-static")
-const WebSocket = require("ws")
-const Client = require("./model/Client")
-const PokerTable = require("./model/pokertable")
-pokerTable = new PokerTable()
+const http = require("http");
+const { STATES } = require("mongoose");
+var node_static = require("node-static");
+const WebSocket = require("ws");
+const Client = require("./model/Client");
+const PokerTable = require("./model/pokertable");
+pokerTable = new PokerTable();
 
-const hostname = "127.0.0.1"
-const webserverPort = process.env.PORT || 8088
-const websocketPort = process.env.WSPORT || 8080
+const hostname = "127.0.0.1";
+const webserverPort = process.env.PORT || 8088;
+const websocketPort = process.env.WSPORT || 8080;
 
-var file = new node_static.Server("../src")
+var file = new node_static.Server("../src");
 
 const server = http.createServer((req, res) => {
-  file.serve(req, res)
-})
+  file.serve(req, res);
+});
 
 const wss = new WebSocket.Server({
   port: websocketPort,
@@ -36,78 +37,81 @@ const wss = new WebSocket.Server({
     threshold: 1024, // Size (in bytes) below which messages
     // should not be compressed.
   },
-})
+});
 
 wss.on("connection", function connection(ws) {
   ws.on("message", function incoming(message) {
-    console.log("received: %s", JSON.parse(message))
+    console.log("received: %s", JSON.parse(message));
 
-    handleMessage(ws, message)
-  })
-})
+    handleMessage(ws, message);
+  });
+});
 
 server.listen(webserverPort, () => {
-  console.log(`Server running at http://${hostname}:${webserverPort}/`)
-})
+  console.log(`Server running at http://${hostname}:${webserverPort}/`);
+});
 
 function handleMessage(ws, message) {
-  const msg = JSON.parse(message)
+  const msg = JSON.parse(message);
 
   switch (msg.type) {
     case "join":
       //console.log('Received join from client');
-      var joinWasSuccessful = pokerTable.addPlayer(msg.name, msg.id)
-      if (joinWasSuccessful) pokerTable.addConnection(ws)
+      var joinWasSuccessful = pokerTable.addPlayer(msg.name, msg.id);
+      if (joinWasSuccessful) pokerTable.addConnection(ws);
       var joinMessageForJoiner = pokerTable.getJoinMessageForJoiner(
         joinWasSuccessful
-      )
-      ws.send(JSON.stringify(joinMessageForJoiner))
+      );
+      ws.send(JSON.stringify(joinMessageForJoiner));
       if (joinWasSuccessful) {
-        var joinMessageForOthers = pokerTable.getJoinMessageForOthers()
+        var joinMessageForOthers = pokerTable.getJoinMessageForOthers();
         wss.clients.forEach(function each(client) {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(joinMessageForOthers))
+            client.send(JSON.stringify(joinMessageForOthers));
           }
-        })
+        });
         if (pokerTable.players.length === 4) {
           setTimeout(function () {
-            pokerTable.startRound()
-            var payload = pokerTable.packTableAsMessage()
+            pokerTable.startRound();
+            var payload = pokerTable.packTableAsMessage();
             pokerTable.connections.forEach(function each(player) {
-              player.send(JSON.stringify(payload))
-            })
-          }, 1000)
+              player.send(JSON.stringify(payload));
+            });
+          }, 1000);
         }
       }
 
-      break
+      break;
     case "action":
-      pokerTable.processAction(msg)
-      var payload = pokerTable.packTableAsMessage(msg)
+      pokerTable.processAction(msg);
+      var payload = pokerTable.packTableAsMessage(msg);
       pokerTable.connections.forEach(function each(player) {
-        player.send(JSON.stringify(payload))
-      })
+        player.send(JSON.stringify(payload));
+      });
 
       if (pokerTable.state === 5 && pokerTable.players.length > 1) {
         setTimeout(function () {
-          pokerTable.startRound(msg)
-          var payload = pokerTable.packTableAsMessage(msg)
+          pokerTable.startRound(msg);
+          var payload = pokerTable.packTableAsMessage(msg);
           pokerTable.connections.forEach(function each(player) {
-            player.send(JSON.stringify(payload))
-          })
-        }, 3000)
+            player.send(JSON.stringify(payload));
+          });
+        }, 7000);
       }
       if (pokerTable.players.length === 1) {
         // player has won
         var message = {
           type: "gameResult",
           winner: pokerTable.players[0].getId(),
-        }
+        };
         pokerTable.connections.forEach(function each(player) {
-          player.send(JSON.stringify(message))
-        })
-        pokerTable = new PokerTable()
+          player.send(JSON.stringify(message));
+        });
+
+        setTimeout(function () {
+          pokerTable = new PokerTable();
+        }, 7000);
       }
-      break
+      break;
   }
 }
