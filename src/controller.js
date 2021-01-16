@@ -159,8 +159,8 @@ class Controller {
     this.model.deletePlayerSession();
 
     setTimeout(function () {
-      //location.reload();
-    }, 100000); //if game is won, make timeout on clientside so that the server starts a new game in the meantime
+      location.reload();
+    }, 12000); //if game is won, make timeout on clientside so that the server starts a new game in the meantime
   }
 
   /**
