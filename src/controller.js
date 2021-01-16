@@ -134,17 +134,33 @@ class Controller {
   handleResult(msg) {
     if (this.isGameWon(msg)) {
       this.model.storeResult(true);
-      alert("You won the game! Congratulations");
+      setTimeout(
+        function (view) {
+          view.showResult("You won the game! Congratulations!");
+        },
+        7000,
+        this.view
+      );
     } else {
       this.model.storeResult(false);
-      alert("Player " + msg.winner + " has won");
+      var player = this.model.pokertable.players.find(
+        (player) => player.id == msg.winner
+      );
+
+      setTimeout(
+        function (view) {
+          view.showResult(player.username + " has won.");
+        },
+        7000,
+        this.view
+      );
     }
 
     this.model.deletePlayerSession();
 
     setTimeout(function () {
-      location.reload();
-    }, 7000); //if game is won, make timeout on clientside so that the server starts a new game in the meantime
+      //location.reload();
+    }, 100000); //if game is won, make timeout on clientside so that the server starts a new game in the meantime
   }
 
   /**

@@ -146,10 +146,11 @@ class OtherPlayer extends SvgPlayer {
 
     var card0 = null,
       card1 = null;
-
-    if (this.isactive && showCards && this.card0 && this.card1) {
-      card0 = this.createCardShown(this.card0, -15, -cardWidth / 2 - 1.5); // half width of card, -1.5 because cards should be 3 apart
-      card1 = this.createCardShown(this.card1, 15, -cardWidth / 2 + 1.5); // half width of card, +1.5 because cards should be 3 apart
+    if (showCards && this.card0 && this.card1) {
+      if (this.isactive || this.isallin) {
+        card0 = this.createCardShown(this.card0, -15, -cardWidth / 2 - 1.5); // half width of card, -1.5 because cards should be 3 apart
+        card1 = this.createCardShown(this.card1, 15, -cardWidth / 2 + 1.5); // half width of card, +1.5 because cards should be 3 apart
+      }
     } else {
       card0 = this.createCard(-15, -cardWidth / 2 - 1.5); // half width of card, -1.5 because cards should be 3 apart
       card1 = this.createCard(15, -cardWidth / 2 + 1.5); // half width of card, +1.5 because cards should be 3 apart
@@ -163,13 +164,16 @@ class OtherPlayer extends SvgPlayer {
       var foldTextGroup = document.createElementNS(xmlns, "g");
       var foldTextNode = document.createElementNS(xmlns, "text");
       var textContent = "";
+      var textTransform = "";
       if (this.isallin) {
         textContent = "All In!";
         foldTextNode.setAttributeNS(null, "class", "text-italic");
+        textTransform = "scale(3.5) translate(0 .3)";
       } else {
         this.cardGroup.setAttributeNS(null, "opacity", 0.5);
         textContent = "FOLD";
         foldTextNode.setAttributeNS(null, "class", "fill-white");
+        textTransform = "scale(2.4) translate(0 -.8)";
       }
 
       var foldTextNodeContent = document.createTextNode(textContent);
@@ -178,11 +182,7 @@ class OtherPlayer extends SvgPlayer {
       parentNode.appendChild(foldTextGroup);
 
       alignSvgObject(foldTextGroup); //align Group before scaling textNode because scaling will be from the center and therefore offset
-      foldTextNode.setAttributeNS(
-        null,
-        "transform",
-        "scale(2.4) translate(0 -.8)"
-      );
+      foldTextNode.setAttributeNS(null, "transform", textTransform);
     }
   }
 
@@ -297,13 +297,16 @@ class SelfPlayer extends SvgPlayer {
       var foldTextGroup = document.createElementNS(xmlns, "g");
       var foldTextNode = document.createElementNS(xmlns, "text");
       var textContent = "";
+      var textTransform = "";
       if (this.isallin) {
         textContent = "All In!";
         foldTextNode.setAttributeNS(null, "class", "text-italic");
+        textTransform = "scale(3.5) translate(0 .3)";
       } else {
         this.cardGroup.setAttributeNS(null, "opacity", 0.5);
         textContent = "FOLD";
         foldTextNode.setAttributeNS(null, "class", "fill-white");
+        textTransform = "scale(2.4) translate(0 -.8)";
       }
       var foldTextNodeContent = document.createTextNode(textContent);
       foldTextNode.appendChild(foldTextNodeContent);
@@ -311,11 +314,7 @@ class SelfPlayer extends SvgPlayer {
       parentNode.appendChild(foldTextGroup);
 
       alignSvgObject(foldTextGroup); //align Group before scaling textNode because scaling will be from the center and therefore offset
-      foldTextNode.setAttributeNS(
-        null,
-        "transform",
-        "scale(2.4) translate(0 -.5)"
-      );
+      foldTextNode.setAttributeNS(null, "transform", textTransform);
     }
   }
 
@@ -643,6 +642,27 @@ class Svg {
     while (this.showWinnerGroup.firstChild) {
       this.showWinnerGroup.removeChild(this.showWinnerGroup.firstChild);
     }
+
+    while (this.playerSelfIsActiveIndicator.firstChild) {
+      this.playerSelfIsActiveIndicator.removeChild(
+        this.playerSelfIsActiveIndicator.firstChild
+      );
+    }
+    while (this.playerLeftIsActiveIndicator.firstChild) {
+      this.playerLeftIsActiveIndicator.removeChild(
+        this.playerLeftIsActiveIndicator.firstChild
+      );
+    }
+    while (this.playerRightIsActiveIndicator.firstChild) {
+      this.playerRightIsActiveIndicator.removeChild(
+        this.playerRightIsActiveIndicator.firstChild
+      );
+    }
+    while (this.playerTopIsActiveIndicator.firstChild) {
+      this.playerTopIsActiveIndicator.removeChild(
+        this.playerTopIsActiveIndicator.firstChild
+      );
+    }
   }
 
   startNotification(notification, parentNode, rotation = 0) {
@@ -713,6 +733,13 @@ class Svg {
         pokertable,
         this.playerSelfIsActiveIndicator
       );
+    } else if (pokertable.result) {
+      //check if player lost just this recent round, if so he has to show cards
+      this.checkPlayerLostOnShowdown(
+        ownPlayerID,
+        pokertable,
+        this.playerSelfGroup
+      );
     } else {
       //if player isn't in current players array
       this.checkPlayerSelfLost(pokertable);
@@ -739,6 +766,13 @@ class Svg {
         otherPlayerId,
         pokertable,
         this.playerLeftIsActiveIndicator
+      );
+    } else if (pokertable.result) {
+      //check if player lost just this recent round, if so he has to show cards
+      this.checkPlayerLostOnShowdown(
+        otherPlayerId,
+        pokertable,
+        this.playerLeftGroup
       );
     } else {
       this.handleOtherPlayerLostOrWaiting(
@@ -775,6 +809,13 @@ class Svg {
         pokertable,
         this.playerTopIsActiveIndicator
       );
+    } else if (pokertable.result) {
+      //check if player lost just this recent round, if so he has to show cards
+      this.checkPlayerLostOnShowdown(
+        otherPlayerId,
+        pokertable,
+        this.playerTopGroup
+      );
     } else {
       this.handleOtherPlayerLostOrWaiting(
         otherPlayerId,
@@ -804,6 +845,13 @@ class Svg {
         otherPlayerId,
         pokertable,
         this.playerRightIsActiveIndicator
+      );
+    } else if (pokertable.result) {
+      //check if player lost just this recent round, if so he has to show cards
+      this.checkPlayerLostOnShowdown(
+        otherPlayerId,
+        pokertable,
+        this.playerRightGroup
       );
     } else {
       this.handleOtherPlayerLostOrWaiting(
@@ -1004,7 +1052,7 @@ class Svg {
     buttonGroup.setAttributeNS(
       null,
       "transform",
-      "scale(0.4) translate(-18 2)"
+      "scale(0.4) translate(-18 10)"
     );
     var buttonCircle = this.createCircle();
     buttonCircle.setAttributeNS(null, "class", "dealerbutton");
@@ -1196,11 +1244,35 @@ class Svg {
     alignSvgObject(textNodeGroup);
 
     textNodeWinners.setAttributeNS(null, "transform", "scale(1.75)");
+  }
 
-    //set and show cards of other players
-    for (let player of players) {
-      if (player.isactive) {
-      }
+  checkPlayerLostOnShowdown(playerId, pokertable, parentNode) {
+    var player = pokertable.playersLost.find((player) => player.id == playerId);
+
+    if (player && player.card0 && player.card1) {
+      var p = new OtherPlayer(player);
+      this.dealCards(p, pokertable, parentNode);
+      p.appendDetails(parentNode);
     }
+  }
+
+  showGameWinner(resultString) {
+    var resultBox = document.createElementNS(xmlns, "g");
+    resultBox.setAttributeNS(null, "transform", "translate(50 25)");
+
+    var rect = document.createElementNS(xmlns, "rect");
+    rect.setAttributeNS(null, "width", 60);
+    rect.setAttributeNS(null, "height", 25);
+    rect.setAttributeNS(null, "fill", "white");
+    rect.setAttributeNS(null, "transform", "translate(-30 -12)");
+    rect.setAttributeNS(null, "stroke", "black");
+    rect.setAttributeNS(null, "stroke-width", "1%");
+
+    var text = this.createTextNode(resultString);
+
+    resultBox.append(rect, text);
+    this.svg.append(resultBox);
+
+    alignSvgObject(text);
   }
 }

@@ -201,7 +201,7 @@ class View {
   }
 
   updateTable(pokertable) {
-    console.log("View. updateTable()");
+    console.log("View.updateTable()");
 
     this.svg.drawTable(pokertable);
     this.svg.showLastAction(pokertable);
@@ -226,5 +226,9 @@ class View {
         this.options.append(button);
       }
     }
+  }
+
+  showResult(resultString) {
+    this.svg.showGameWinner(resultString);
   }
 }

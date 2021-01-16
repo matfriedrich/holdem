@@ -441,6 +441,13 @@ class PokerTable {
     }
     this.state = states.result;
     this.options = [];
+
+    //delete cards of players that already lost in a previous round
+    //so that their cards won't get shown when resolving in Client's View
+    for (let p of this.playersLost) {
+      p.setCard0(null);
+      p.setCard1(null);
+    }
     this.removePlayersWithoutBalance();
   }
 
@@ -465,6 +472,10 @@ class PokerTable {
       activePlayerId = this.players[this.activePlayerIndex].getId();
     if (this.dealerIndex < this.players.length)
       dealerId = this.players[this.dealerIndex].getId();
+
+    if (this.state == states.result) {
+      activePlayerId = -1; //if round is resolved, no one is active player
+    }
 
     switch (this.state) {
       case states.flop:

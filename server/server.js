@@ -98,6 +98,7 @@ function handleMessage(ws, message) {
           });
         }, 10000); //if round ends, make timeout here so that the new message that forces the client to update isn't sent too early
       }
+
       if (pokerTable.players.length === 1) {
         // player has won
         var message = {
