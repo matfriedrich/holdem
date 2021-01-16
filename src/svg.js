@@ -131,17 +131,32 @@ class OtherPlayer extends SvgPlayer {
     console.log("OtherPlayer()");
 
     super(player);
+
+    this.card0 = null;
+    this.card1 = null;
+
+    if (player.card0 && player.card1) {
+      this.card0 = player.card0;
+      this.card1 = player.card1;
+    }
   }
 
-  appendCardGroup(parentNode) {
+  appendCardGroup(parentNode, showCards = false) {
     this.cardGroup = document.createElementNS(xmlns, "g");
 
-    var card1 = this.createCard(-15, -cardWidth / 2 - 1.5); // half width of card, -1.5 because cards should be 3 apart
+    var card0 = null,
+      card1 = null;
+
+    if (this.isactive && showCards && this.card0 && this.card1) {
+      card0 = this.createCardShown(this.card0, -15, -cardWidth / 2 - 1.5); // half width of card, -1.5 because cards should be 3 apart
+      card1 = this.createCardShown(this.card1, 15, -cardWidth / 2 + 1.5); // half width of card, +1.5 because cards should be 3 apart
+    } else {
+      card0 = this.createCard(-15, -cardWidth / 2 - 1.5); // half width of card, -1.5 because cards should be 3 apart
+      card1 = this.createCard(15, -cardWidth / 2 + 1.5); // half width of card, +1.5 because cards should be 3 apart
+    }
+
+    this.cardGroup.append(card0);
     this.cardGroup.append(card1);
-
-    var card2 = this.createCard(15, -cardWidth / 2 + 1.5); // half width of card, +1.5 because cards should be 3 apart
-    this.cardGroup.append(card2);
-
     parentNode.appendChild(this.cardGroup);
 
     if (!this.isactive) {
@@ -188,6 +203,70 @@ class OtherPlayer extends SvgPlayer {
     card.setAttributeNS(null, "class", "card");
 
     return card;
+  }
+
+  createCardShown(cardObject = null, rotation = 15, translationX = 0) {
+    var height = cardHeight;
+    var width = cardWidth;
+
+    var cardGroup = document.createElementNS(xmlns, "g");
+    cardGroup.setAttributeNS(
+      null,
+      "transform",
+      "translate(" + translationX + " -4) rotate(" + rotation + ")"
+    );
+
+    if (cardObject) {
+      var card = document.createElementNS(xmlns, "rect");
+      card.setAttributeNS(null, "width", width);
+      card.setAttributeNS(null, "height", height);
+      card.setAttributeNS(null, "ry", "2%");
+
+      card.setAttributeNS(null, "class", "card card-front");
+      cardGroup.append(card);
+
+      //SUIT
+      var suit = null;
+      switch (cardObject.suit) {
+        case "c":
+          suit = SvgSuit.getSvg(SvgSuit.clubs);
+          break;
+        case "h":
+          suit = SvgSuit.getSvg(SvgSuit.hearts);
+          break;
+        case "d":
+          suit = SvgSuit.getSvg(SvgSuit.diamonds);
+          break;
+        case "s":
+          suit = SvgSuit.getSvg(SvgSuit.spades);
+          break;
+      }
+
+      if (suit) {
+        suit.setAttributeNS(
+          null,
+          "transform",
+          "translate(-1.8 -1.3) scale(0.01)"
+        );
+        cardGroup.append(suit);
+      }
+
+      //VALUE
+      if (cardObject.value == "T") {
+        cardObject.value = 10;
+      }
+      var cardValueSvg = document.createElementNS(xmlns, "text");
+      var cardValueSvgText = document.createTextNode(cardObject.value);
+      cardValueSvg.setAttributeNS(null, "transform", "translate(.6 1.6)");
+      cardValueSvg.appendChild(cardValueSvgText);
+      cardGroup.appendChild(cardValueSvg);
+
+      if (cardObject.suit == "h" || cardObject.suit == "d") {
+        cardValueSvg.setAttributeNS(null, "class", "fill-red");
+      }
+    }
+
+    return cardGroup;
   }
 }
 
@@ -487,6 +566,12 @@ class Svg {
       this.playerRightBubbleGroup,
       this.playerSelfBubbleGroup
     );
+
+    //set Svg Players
+    this.playerSelf = null;
+    this.playerLeft = null;
+    this.playerTop = null;
+    this.playerRight = null;
   }
 
   createCircle(cx = 0, cy = 0, r = 1) {
@@ -554,6 +639,10 @@ class Svg {
       //reset SVG Area
       this.playerSelfGroup.removeChild(this.playerSelfGroup.firstChild);
     }
+
+    while (this.showWinnerGroup.firstChild) {
+      this.showWinnerGroup.removeChild(this.showWinnerGroup.firstChild);
+    }
   }
 
   startNotification(notification, parentNode, rotation = 0) {
@@ -601,6 +690,7 @@ class Svg {
     console.log("pokertable: ", pokertable);
 
     this.resetTable();
+    this.playerSelf = this.playerLeft = this.playerTop = this.playerRight = null;
 
     var ownPlayerID = pokertable.playerId;
     var players = []; //just to be sure that array index correlates to player's id
@@ -614,6 +704,7 @@ class Svg {
     var ownPlayer = players[ownPlayerID];
     if (ownPlayer) {
       var p = new SelfPlayer(ownPlayer);
+      this.playerSelf = p;
       this.dealCards(p, pokertable, this.playerSelfGroup);
       p.appendDetails(this.playerSelfGroup);
 
@@ -640,6 +731,7 @@ class Svg {
     var otherPlayer = players[otherPlayerId];
     if (otherPlayer) {
       var p = new OtherPlayer(otherPlayer);
+      this.playerLeft = p;
       this.dealCards(p, pokertable, this.playerLeftGroup);
       p.appendDetails(this.playerLeftGroup);
 
@@ -674,6 +766,7 @@ class Svg {
     otherPlayer = players[otherPlayerId];
     if (otherPlayer) {
       var p = new OtherPlayer(otherPlayer);
+      this.playerTop = p;
       this.dealCards(p, pokertable, this.playerTopGroup);
       p.appendDetails(this.playerTopGroup);
 
@@ -703,6 +796,7 @@ class Svg {
     otherPlayer = players[otherPlayerId];
     if (otherPlayer) {
       var p = new OtherPlayer(otherPlayer);
+      this.playerRight = p;
       this.dealCards(p, pokertable, this.playerRightGroup);
       p.appendDetails(this.playerRightGroup);
 
@@ -1006,6 +1100,8 @@ class Svg {
           playerGroupNode,
           svgPlayer
         );
+      } else if (pokertable.result) {
+        svgPlayer.appendCardGroup(playerGroupNode, true);
       } else {
         svgPlayer.appendCardGroup(playerGroupNode);
       }
@@ -1086,7 +1182,10 @@ class Svg {
       winnerNames += " wins";
     }
 
-    winnerNames += " with a " + pokertable.result[0].winningHand;
+    //there's no winning Hand if all others folded
+    if (pokertable.result[0].winningHand) {
+      winnerNames += " with a " + pokertable.result[0].winningHand;
+    }
 
     var textNodeWinners = this.createTextNode(winnerNames);
     textNodeWinners.setAttributeNS(null, "fill", "white");
@@ -1097,5 +1196,11 @@ class Svg {
     alignSvgObject(textNodeGroup);
 
     textNodeWinners.setAttributeNS(null, "transform", "scale(1.75)");
+
+    //set and show cards of other players
+    for (let player of players) {
+      if (player.isactive) {
+      }
+    }
   }
 }
