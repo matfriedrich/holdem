@@ -425,18 +425,18 @@ class PokerTable {
 
   resolveRound(winners) {
     console.log("Resolving round");
-    var i;
-    for (i = 0; i < winners.length; i++) {
+    this.result = [];
+    for (let i = 0; i < winners.length; i++) {
       winners[i].setBalance(
         winners[i].getBalance() + this.pot / winners.length
       );
-      this.result +=
-        "Player " +
-        winners[i].getId() +
-        " has won " +
-        this.pot / winners.length +
-        " " +
-        this.winningHand;
+
+      this.result.push({
+        playerId: winners[i].getId(),
+        amountWon: this.pot / winners.length,
+        winningHand: this.winningHand,
+      });
+
       console.log(this.result);
     }
     this.state = states.result;

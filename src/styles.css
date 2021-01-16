@@ -35,6 +35,7 @@ button,
   max-width: 100%;
   margin: 2rem auto;
   padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 #canvas {
@@ -47,8 +48,9 @@ button,
 
 #svgBox {
   width: 100%;
-  padding: 20px;
+  padding: 20px 0;
   background: #216e07;
+  box-sizing: border-box;
 }
 
 #options {
@@ -57,6 +59,7 @@ button,
   background: #216e07;
   text-align: center;
   min-height: 100px;
+  box-sizing: border-box;
 }
 
 .text-italic {

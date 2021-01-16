@@ -96,7 +96,7 @@ function handleMessage(ws, message) {
           pokerTable.connections.forEach(function each(player) {
             player.send(JSON.stringify(payload));
           });
-        }, 7000); //if round ends, make timeout here so that the new message that forces the client to update isn't sent too early
+        }, 10000); //if round ends, make timeout here so that the new message that forces the client to update isn't sent too early
       }
       if (pokerTable.players.length === 1) {
         // player has won

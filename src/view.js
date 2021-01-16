@@ -206,6 +206,10 @@ class View {
     this.svg.drawTable(pokertable);
     this.svg.showLastAction(pokertable);
 
+    if (pokertable.result) {
+      this.svg.resolveRound(pokertable);
+    }
+
     while (this.options.firstChild) {
       this.options.removeChild(this.options.firstChild);
     }

@@ -328,6 +328,12 @@ class Svg {
     filter.appendChild(gaussian);
     defs.appendChild(filter);
 
+    //group that will show Winner after a round or after game
+    this.showWinnerGroup = document.createElementNS(xmlns, "g");
+    this.showWinnerGroup.id = "showWinnerGroup";
+    this.showWinnerGroup.setAttributeNS(null, "transform", "translate(50 16)");
+    this.svg.append(this.showWinnerGroup);
+
     //define Player IsActiveIndicators Positions
     this.playerTopIsActiveIndicator = document.createElementNS(xmlns, "g");
     this.playerTopIsActiveIndicator.id = "playerTopIsActiveIndicator";
@@ -1055,5 +1061,41 @@ class Svg {
         this.startNotification(lastActionString, parentNode, bubbleRotation);
       }
     }
+  }
+
+  resolveRound(pokertable) {
+    console.log("Svg.resolveRound()");
+
+    var players = []; //just to be sure that array index correlates to player's id
+    for (let player of pokertable.players) {
+      players[player.id] = player;
+    }
+
+    var winnerNames = "";
+    for (let i = 0; i < pokertable.result.length; i++) {
+      var playerName = players[pokertable.result[i].playerId].username;
+      if (i > 0) {
+        winnerNames += " & ";
+      }
+      winnerNames += playerName;
+    }
+
+    if (pokertable.result.length > 1) {
+      winnerNames += " win";
+    } else {
+      winnerNames += " wins";
+    }
+
+    winnerNames += " with a " + pokertable.result[0].winningHand;
+
+    var textNodeWinners = this.createTextNode(winnerNames);
+    textNodeWinners.setAttributeNS(null, "fill", "white");
+    var textNodeGroup = document.createElementNS(xmlns, "g");
+    textNodeGroup.append(textNodeWinners);
+
+    this.showWinnerGroup.append(textNodeGroup);
+    alignSvgObject(textNodeGroup);
+
+    textNodeWinners.setAttributeNS(null, "transform", "scale(1.75)");
   }
 }
