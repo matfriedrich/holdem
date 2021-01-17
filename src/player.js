@@ -1,3 +1,6 @@
+/**
+ * Player
+ */
 class Player {
   /**
    * Creates a new Player Object

@@ -1,18 +1,21 @@
+/**
+ * Controller
+ */
 class Controller {
   /**
    * Creates a new Controller Object
    */
   constructor() {
-    this.model = new Model();
-    this.view = new View();
+    this.model = new Model()
+    this.view = new View()
 
-    this.view.bindJoin(this.sendJoin);
-    this.view.bindStatistics(this.showStatistics);
-    this.view.bindAction(this.sendAction);
-    this.view.bindDrop(this.sendAllin);
-    this.model.bindPokertableChanged(this.onPokertableChanged);
-    this.model.bindBoardChanged(this.onBoardChanged);
-    this.model.bindPlayersChanged(this.onPlayersChanged);
+    this.view.bindJoin(this.sendJoin)
+    this.view.bindStatistics(this.showStatistics)
+    this.view.bindAction(this.sendAction)
+    this.view.bindDrop(this.sendAllin)
+    this.model.bindPokertableChanged(this.onPokertableChanged)
+    this.model.bindBoardChanged(this.onBoardChanged)
+    this.model.bindPlayersChanged(this.onPlayersChanged)
   }
 
   /**
@@ -22,9 +25,9 @@ class Controller {
    * sendJoin("john doe")
    */
   sendJoin = (username) => {
-    const message = { type: "join", name: username };
-    sendMessage(message);
-  };
+    const message = { type: "join", name: username }
+    sendMessage(message)
+  }
 
   /**
    * Send rejoin message
@@ -32,9 +35,9 @@ class Controller {
    *
    */
   sendRejoin = (session) => {
-    const message = { type: "join", name: session.name, id: session.id };
-    sendMessage(message);
-  };
+    const message = { type: "join", name: session.name, id: session.id }
+    sendMessage(message)
+  }
 
   /**
    * Send action message
@@ -45,36 +48,36 @@ class Controller {
       type: "action",
       player: this.model.getPlayerId(),
       action: action,
-    };
-    sendMessage(message);
-  };
+    }
+    sendMessage(message)
+  }
 
   /**
    * Send all in message
    * @param {Event} ev - event of AllIn Drop
    */
   sendAllin = (ev) => {
-    var data = ev.dataTransfer.getData("text");
-    console.log("data " + data);
-    ev.target.appendChild(document.getElementById(data));
+    var data = ev.dataTransfer.getData("text")
+    console.log("data " + data)
+    ev.target.appendChild(document.getElementById(data))
 
     const message = {
       type: "action",
       player: this.model.getPlayerId(),
       action: "All In",
-    };
-    sendMessage(message);
-  };
+    }
+    sendMessage(message)
+  }
 
   /**
    * Show game statistics in an alert message
    */
   showStatistics = () => {
-    var statistics = this.model.retrieveResults();
-    var losses = statistics[0] - statistics[1];
-    var winrate = 0;
+    var statistics = this.model.retrieveResults()
+    var losses = statistics[0] - statistics[1]
+    var winrate = 0
     if (statistics[0] != 0)
-      winrate = Math.round((statistics[1] / statistics[0]) * 100);
+      winrate = Math.round((statistics[1] / statistics[0]) * 100)
 
     alert(
       "Total Games played: " +
@@ -89,8 +92,8 @@ class Controller {
         "Win rate: " +
         winrate +
         "%"
-    );
-  };
+    )
+  }
 
   /**
    * Handle "join" message from server
@@ -98,16 +101,16 @@ class Controller {
    */
   handleJoin(msg) {
     if (msg.status === "fail") {
-      alert("Table is already full!");
-      return;
+      alert("Table is already full!")
+      return
     }
 
-    this.model.setPlayerId(msg.player.id);
-    this.model.storePlayerSession(msg.player.username, msg.player.id);
-    this.model.setPlayers(msg.existingplayers);
-    console.log("Player " + msg.player.username + " has joined");
+    this.model.setPlayerId(msg.player.id)
+    this.model.storePlayerSession(msg.player.username, msg.player.id)
+    this.model.setPlayers(msg.existingplayers)
+    console.log("Player " + msg.player.username + " has joined")
 
-    this.view.displayTable(this.model.pokertable);
+    this.view.displayTable(this.model.pokertable)
   }
 
   /**
@@ -115,8 +118,8 @@ class Controller {
    * @param {*} msg - message of type "otherJoin"
    */
   handleOtherPlayerJoin(msg) {
-    this.model.setPlayers(msg.existingplayers);
-    console.log("Player " + msg.player.username + " has joined");
+    this.model.setPlayers(msg.existingplayers)
+    console.log("Player " + msg.player.username + " has joined")
   }
 
   /**
@@ -124,7 +127,7 @@ class Controller {
    * @param {*} msg - message of type "tablestatus"
    */
   handleRound(msg) {
-    this.model.updatePokertable(msg);
+    this.model.updatePokertable(msg)
   }
 
   /**
@@ -133,34 +136,34 @@ class Controller {
    */
   handleResult(msg) {
     if (this.isGameWon(msg)) {
-      this.model.storeResult(true);
+      this.model.storeResult(true)
       setTimeout(
         function (view) {
-          view.showResult("You won the game! Congratulations!");
+          view.showResult("You won the game! Congratulations!")
         },
         7000,
         this.view
-      );
+      )
     } else {
-      this.model.storeResult(false);
+      this.model.storeResult(false)
       var player = this.model.pokertable.players.find(
         (player) => player.id == msg.winner
-      );
+      )
 
       setTimeout(
         function (view) {
-          view.showResult(player.username + " has won.");
+          view.showResult(player.username + " has won.")
         },
         7000,
         this.view
-      );
+      )
     }
 
-    this.model.deletePlayerSession();
+    this.model.deletePlayerSession()
 
     setTimeout(function () {
-      location.reload();
-    }, 12000); //if game is won, make timeout on clientside so that the server starts a new game in the meantime
+      location.reload()
+    }, 12000) //if game is won, make timeout on clientside so that the server starts a new game in the meantime
   }
 
   /**
@@ -168,8 +171,8 @@ class Controller {
    * @param {PokerTable} pokertable - pokertable to update
    */
   onPokertableChanged = (pokertable) => {
-    this.view.updateTable(pokertable);
-  };
+    this.view.updateTable(pokertable)
+  }
 
   /**
    * Update Board if it changed
@@ -178,16 +181,16 @@ class Controller {
    * @param {Card} river - River card to update
    */
   onBoardChanged = (flop, turn, river) => {
-    this.view.updateBoard(flop, turn, river);
-  };
+    this.view.updateBoard(flop, turn, river)
+  }
 
   /**
    * Update pokertable if players changed (e.g. joined)
    * @param {PokerTable} pokertable - pokertable to update
    */
   onPlayersChanged = (pokertable) => {
-    this.view.updatePlayers(pokertable);
-  };
+    this.view.updatePlayers(pokertable)
+  }
 
   /**
    * Checks if player is the winner by looking at the result message
@@ -195,66 +198,66 @@ class Controller {
    * @return {boolean} - true if player is winner, otherwise false
    */
   isGameWon(message) {
-    if (message.winner === this.model.getPlayerId()) return true;
-    else return false;
+    if (message.winner === this.model.getPlayerId()) return true
+    else return false
   }
 }
 
-let c = new Controller();
+let c = new Controller()
 
-const testObject = { username: "testuser", ip: "192.168.0.1" };
+const testObject = { username: "testuser", ip: "192.168.0.1" }
 
-let baseUrl = window.location.host.split(":")[0];
+let baseUrl = window.location.host.split(":")[0]
 
-let connection = new WebSocket("ws://" + baseUrl + ":8080", ["soap", "xmpp"]);
+let connection = new WebSocket("ws://" + baseUrl + ":8080", ["soap", "xmpp"])
 /**
  * When the connection is open, send some data to the server
  */
 connection.onopen = function () {
-  connection.send(JSON.stringify(testObject)); // Send the message 'Ping' to the server
+  connection.send(JSON.stringify(testObject)) // Send the message 'Ping' to the server
 
   // if there is a previous session: rejoin
-  var savedPlayerSession = c.model.retrievePlayerSession();
-  if (savedPlayerSession !== null) c.sendRejoin(savedPlayerSession);
-};
+  var savedPlayerSession = c.model.retrievePlayerSession()
+  if (savedPlayerSession !== null) c.sendRejoin(savedPlayerSession)
+}
 
 /**
  * Log error
  * @param {*} error
  */
 connection.onerror = function (error) {
-  console.log("WebSocket Error " + error);
-};
+  console.log("WebSocket Error " + error)
+}
 
 /**
  * Log messages from the server
  * @param {Event} e
  */
 connection.onmessage = function (e) {
-  console.log("Server: " + e.data);
+  console.log("Server: " + e.data)
 
-  var msg = JSON.parse(e.data);
+  var msg = JSON.parse(e.data)
 
   switch (msg.type) {
     case "join":
-      c.handleJoin(msg);
-      break;
+      c.handleJoin(msg)
+      break
     case "otherJoin":
-      c.handleOtherPlayerJoin(msg);
-      break;
+      c.handleOtherPlayerJoin(msg)
+      break
     case "tablestatus":
-      c.handleRound(msg);
-      break;
+      c.handleRound(msg)
+      break
     case "gameResult":
-      c.handleResult(msg);
-      break;
+      c.handleResult(msg)
+      break
   }
-};
+}
 
 /**
  * Send message over connection
  * @param {*} message - object to send
  */
 function sendMessage(message) {
-  connection.send(JSON.stringify(message));
+  connection.send(JSON.stringify(message))
 }

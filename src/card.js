@@ -1,3 +1,6 @@
+/**
+ * Card
+ */
 class Card {
   /**
    * Creates a new Card Object

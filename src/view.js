@@ -1,54 +1,57 @@
+/**
+ * View
+ */
 class View {
   /**
-   * Creates a new View
+   * Creates a new View Object
    */
   constructor() {
-    this.app = this.getElement("#root");
+    this.app = this.getElement("#root")
 
-    this.title = this.createElement("h1");
-    this.title.textContent = "Texas Holdem";
-    this.title.classList.add("text-center");
+    this.title = this.createElement("h1")
+    this.title.textContent = "Texas Holdem"
+    this.title.classList.add("text-center")
 
-    this.form = this.createElement("form");
-    this.form.classList.add("text-center");
+    this.form = this.createElement("form")
+    this.form.classList.add("text-center")
 
-    this.main = this.createElement("div");
-    this.main.className = "flex-container";
+    this.main = this.createElement("div")
+    this.main.className = "flex-container"
 
-    this.svgBox = this.createElement("div");
-    this.svgBox.id = "svgBox";
-    this.svg = new Svg(this.svgBox);
-    this.options = this.createElement("div");
-    this.options.id = "options";
+    this.svgBox = this.createElement("div")
+    this.svgBox.id = "svgBox"
+    this.svg = new Svg(this.svgBox)
+    this.options = this.createElement("div")
+    this.options.id = "options"
 
     this.svgBox.addEventListener("dragover", (event) => {
-      this.handleDragover(event);
-    });
+      this.handleDragover(event)
+    })
 
-    this.input = this.createElement("input");
-    this.input.type = "text";
-    this.input.setAttribute("autofocus", true);
-    this.input.placeholder = "Guest";
-    this.input.id = "usernameinput";
-    this.input.pattern = "[A-Za-z0-9]+";
-    this.input.required = true;
+    this.input = this.createElement("input")
+    this.input.type = "text"
+    this.input.setAttribute("autofocus", true)
+    this.input.placeholder = "Guest"
+    this.input.id = "usernameinput"
+    this.input.pattern = "[A-Za-z0-9]+"
+    this.input.required = true
     this.input.title =
-      "Username should only contain letters and numbers. e.g. John123";
+      "Username should only contain letters and numbers. e.g. John123"
 
-    this.joinButton = this.createElement("input");
-    this.joinButton.id = "joinButton";
-    this.joinButton.classList.add("btn");
-    this.joinButton.type = "submit";
-    this.joinButton.value = "Join Game";
+    this.joinButton = this.createElement("input")
+    this.joinButton.id = "joinButton"
+    this.joinButton.classList.add("btn")
+    this.joinButton.type = "submit"
+    this.joinButton.value = "Join Game"
 
-    this.statisticsButton = this.createElement("button");
-    this.statisticsButton.id = "statisticsButton";
-    this.statisticsButton.classList.add("btn");
-    this.statisticsButton.textContent = "Statistics";
+    this.statisticsButton = this.createElement("button")
+    this.statisticsButton.id = "statisticsButton"
+    this.statisticsButton.classList.add("btn")
+    this.statisticsButton.textContent = "Statistics"
 
-    this.form.append(this.input, this.joinButton, this.statisticsButton);
+    this.form.append(this.input, this.joinButton, this.statisticsButton)
 
-    this.app.append(this.title, this.form, this.main);
+    this.app.append(this.title, this.form, this.main)
   }
 
   /**
@@ -58,12 +61,12 @@ class View {
    * @return {*} element that was created
    */
   createElement(tag, className) {
-    const element = document.createElement(tag);
+    const element = document.createElement(tag)
     if (className) {
-      element.classList.add(className);
+      element.classList.add(className)
     }
 
-    return element;
+    return element
   }
 
   /**
@@ -72,9 +75,9 @@ class View {
    * @return {*} element
    */
   getElement(selector) {
-    const element = document.querySelector(selector);
+    const element = document.querySelector(selector)
 
-    return element;
+    return element
   }
 
   /**
@@ -82,9 +85,9 @@ class View {
    * @param {*} id Identifier of the element
    */
   removeElement(id) {
-    var element = document.getElementById(id);
+    var element = document.getElementById(id)
     if (element !== null) {
-      element.parentNode.removeChild(element);
+      element.parentNode.removeChild(element)
     }
   }
 
@@ -94,10 +97,10 @@ class View {
    */
   bindJoin(handler) {
     this.form.addEventListener("submit", (event) => {
-      event.preventDefault();
+      event.preventDefault()
 
-      handler(this.input.value);
-    });
+      handler(this.input.value)
+    })
   }
 
   /**
@@ -106,10 +109,10 @@ class View {
    */
   bindStatistics(handler) {
     this.statisticsButton.addEventListener("click", (event) => {
-      event.preventDefault();
+      event.preventDefault()
 
-      handler();
-    });
+      handler()
+    })
   }
 
   /**
@@ -118,8 +121,8 @@ class View {
    */
   bindAction(handler) {
     this.options.addEventListener("click", (event) => {
-      handler(event.target.textContent);
-    });
+      handler(event.target.textContent)
+    })
   }
 
   /**
@@ -129,10 +132,10 @@ class View {
   bindDrop(handler) {
     this.svgBox.addEventListener("drop", (event) => {
       if (event.preventDefault) {
-        event.preventDefault();
+        event.preventDefault()
       }
-      handler(event);
-    });
+      handler(event)
+    })
   }
 
   /**
@@ -140,16 +143,16 @@ class View {
    * @return {*} element that was created
    */
   createAllinImg() {
-    var allin = this.createElement("img");
-    allin.id = "allin";
-    allin.src = "chips.svg";
-    allin.draggable = "true";
+    var allin = this.createElement("img")
+    allin.id = "allin"
+    allin.src = "chips.svg"
+    allin.draggable = "true"
 
     allin.addEventListener("dragstart", (event) => {
-      this.handleDragStart(event);
-    });
+      this.handleDragStart(event)
+    })
 
-    return allin;
+    return allin
   }
 
   /**
@@ -157,7 +160,7 @@ class View {
    * @param {*} ev Event
    */
   handleDragStart(ev) {
-    ev.dataTransfer.setData("text", ev.target.id);
+    ev.dataTransfer.setData("text", ev.target.id)
   }
 
   /**
@@ -166,7 +169,7 @@ class View {
    */
   handleDragover(ev) {
     if (ev.preventDefault) {
-      ev.preventDefault();
+      ev.preventDefault()
     }
   }
 
@@ -175,16 +178,16 @@ class View {
    * @param {PokerTable} pokertable The pokertable to draw
    */
   displayTable(pokertable) {
-    console.log("View. displayTable()");
+    console.log("View. displayTable()")
 
-    this.removeElement("joinButton");
-    this.removeElement("usernameinput");
-    this.removeElement("statisticsButton");
-    this.main.append(this.svgBox, this.options);
+    this.removeElement("joinButton")
+    this.removeElement("usernameinput")
+    this.removeElement("statisticsButton")
+    this.main.append(this.svgBox, this.options)
 
-    this.svg.setPotTranslations(); //called after appending this.svgBox so that the translations can be calculated
+    this.svg.setPotTranslations() //called after appending this.svgBox so that the translations can be calculated
 
-    this.svg.drawTable(pokertable);
+    this.svg.drawTable(pokertable)
   }
 
   /**
@@ -192,9 +195,9 @@ class View {
    * @param {PokerTable} pokertable The pokertable to draw
    */
   updatePlayers(pokertable) {
-    console.log("View.updatePlayers()");
+    console.log("View.updatePlayers()")
 
-    this.svg.drawTable(pokertable);
+    this.svg.drawTable(pokertable)
   }
 
   /**
@@ -204,9 +207,9 @@ class View {
    * @param {Object} river Object representing "river" card
    */
   updateBoard(flop, turn, river) {
-    console.log("View.updateBoard()");
+    console.log("View.updateBoard()")
 
-    this.svg.updateBoard(flop, turn, river);
+    this.svg.updateBoard(flop, turn, river)
   }
 
   /**
@@ -214,29 +217,29 @@ class View {
    * @param {PokerTable} pokertable The pokertable to draw
    */
   updateTable(pokertable) {
-    console.log("View.updateTable()");
+    console.log("View.updateTable()")
 
-    this.svg.drawTable(pokertable);
-    this.svg.showLastAction(pokertable);
+    this.svg.drawTable(pokertable)
+    this.svg.showLastAction(pokertable)
 
     if (pokertable.result) {
-      this.svg.resolveRound(pokertable);
+      this.svg.resolveRound(pokertable)
     }
 
     while (this.options.firstChild) {
-      this.options.removeChild(this.options.firstChild);
+      this.options.removeChild(this.options.firstChild)
     }
-    var j;
+    var j
 
     if (pokertable.isActivePlayer) {
       for (j = 0; j < pokertable.options.length; j++) {
         if (pokertable.options[j] == "All In") {
-          this.options.append(this.createAllinImg());
-          continue;
+          this.options.append(this.createAllinImg())
+          continue
         }
-        var button = this.createElement("button");
-        button.textContent = pokertable.options[j];
-        this.options.append(button);
+        var button = this.createElement("button")
+        button.textContent = pokertable.options[j]
+        this.options.append(button)
       }
     }
   }
@@ -246,6 +249,6 @@ class View {
    * @param {String} resultString Textual information about who wins the game
    */
   showResult(resultString) {
-    this.svg.showGameWinner(resultString);
+    this.svg.showGameWinner(resultString)
   }
 }
