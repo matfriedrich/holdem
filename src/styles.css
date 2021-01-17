@@ -19,7 +19,8 @@ button,
 input,
 button,
 .btn {
-  padding: 0.3rem 0.5rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 18px;
 }
 
 .flex_container {
@@ -60,6 +61,16 @@ button,
   text-align: center;
   min-height: 100px;
   box-sizing: border-box;
+}
+
+#options #allin {
+  width: 7.5%;
+  margin: 0 1rem;
+}
+
+#options button {
+  margin-top: 40px;
+  vertical-align: top;
 }
 
 .text-italic {

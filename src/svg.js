@@ -29,6 +29,10 @@ class SvgPlayer {
     }
   }
 
+  /**
+   * displays player information within specified parentNode on the SVG
+   * @param {Node} parentNode Parent node which the created SVG group is appended to
+   */
   appendDetails(parent) {
     if (parent) {
       var textBox, bbox, width, height;
@@ -141,6 +145,11 @@ class OtherPlayer extends SvgPlayer {
     }
   }
 
+  /**
+   * displays a pair of cards within specified parentNode on the SVG
+   * @param {Node} parentNode Parent node which the created card group is appended to
+   * @param {boolean} showCards Should card information be shown or hidden
+   */
   appendCardGroup(parentNode, showCards = false) {
     this.cardGroup = document.createElementNS(xmlns, "g");
 
@@ -186,6 +195,12 @@ class OtherPlayer extends SvgPlayer {
     }
   }
 
+  /**
+   * Creates a SVG rect representing a card
+   * @param {number} rotation Number of degrees the card object should be rotated
+   * @param {number} translationX Translation on the x axis of the card object
+   * @return {SVGRectElement} SVG rect object representing a card
+   */
   createCard(rotation = 15, translationX = 0) {
     var height = cardHeight;
     var width = cardWidth;
@@ -205,6 +220,13 @@ class OtherPlayer extends SvgPlayer {
     return card;
   }
 
+  /**
+   * Creates a SVG rect representing a card and showing card's face information
+   * @param {Object} cardObject Object containing card face information
+   * @param {number} rotation Number of degrees the card object should be rotated
+   * @param {number} translationX Translation on the x axis of the card object
+   * @return {SVGGElement} SVG group element representing a card
+   */
   createCardShown(cardObject = null, rotation = 15, translationX = 0) {
     var height = cardHeight;
     var width = cardWidth;
@@ -280,6 +302,10 @@ class SelfPlayer extends SvgPlayer {
     this.card1 = player.card1;
   }
 
+  /**
+   * displays a pair of cards within specified parentNode on the SVG
+   * @param {Node} parentNode Parent node which the created card group is appended to
+   */
   appendCardGroup(parentNode) {
     this.cardGroup = document.createElementNS(xmlns, "g");
 
@@ -318,6 +344,13 @@ class SelfPlayer extends SvgPlayer {
     }
   }
 
+  /**
+   * Creates a SVG rect representing a card and showing card's face information
+   * @param {Object} cardObject Object containing card face information
+   * @param {number} rotation Number of degrees the card object should be rotated
+   * @param {number} translationX Translation on the x axis of the card object
+   * @return {SVGGElement} SVG group element representing a card
+   */
   createCard(cardObject = this.card0, rotation = 15, translationX = 0) {
     var height = cardHeight;
     var width = cardWidth;
@@ -573,6 +606,13 @@ class Svg {
     this.playerRight = null;
   }
 
+  /**
+   * Creates a simple SVG circle object
+   * @param {number} cx center on the x-axis of the circle object
+   * @param {number} cy center on the y-axis of the circle object
+   * @param {number} r radius of the circle object
+   * @return {SVGCircleElement} SVG circle object
+   */
   createCircle(cx = 0, cy = 0, r = 1) {
     var circle = document.createElementNS(xmlns, "circle");
     circle.setAttributeNS(null, "cx", cx);
@@ -582,6 +622,14 @@ class Svg {
     return circle;
   }
 
+  /**
+   * Creates a simple SVG ellipse object
+   * @param {number} cx center on the x-axis of the circle object
+   * @param {number} cy center on the y-axis of the circle object
+   * @param {number} rx radius on the x-axis of the ellipse object
+   * @param {number} ry radius on the y-axis of the ellipse object
+   * @return {SVGEllipseElement} SVG ellipse object
+   */
   createEllipse(cx = 0, cy = 0, rx = 2, ry = 1) {
     var ellipse = document.createElementNS(xmlns, "ellipse");
     ellipse.setAttributeNS(null, "cx", cx);
@@ -592,6 +640,11 @@ class Svg {
     return ellipse;
   }
 
+  /**
+   * Creates a simple SVG text element
+   * @param {String} text The text content of the created Text Element
+   * @return {SVGTextElement} SVG text object
+   */
   createTextNode(text) {
     var textNode = document.createElementNS(xmlns, "text");
     var content = document.createTextNode(text);
@@ -600,6 +653,10 @@ class Svg {
     return textNode;
   }
 
+  /**
+   * Creates a 'Waiting for Player' Indicator and appends it to the parent element
+   * @param {*} parent The parent node the created group will be appended to
+   */
   appendWaitingText(parent) {
     var group = document.createElementNS(xmlns, "g");
     var element = this.createTextNode("Waiting for player");
@@ -618,6 +675,9 @@ class Svg {
     alignSvgObject(group);
   }
 
+  /**
+   * Simply removes all child elements of certain SVG groups
+   */
   resetTable() {
     while (this.playerLeftGroup.firstChild) {
       //reset SVG Area
@@ -665,6 +725,12 @@ class Svg {
     }
   }
 
+  /**
+   * Creates a speech bubble to indicate a player's action. The speech bubble will remove itself after some timeout.
+   * @param {String} notification The text content of the speech bubble
+   * @param {*} parentNode The parent node the created group will be appended to
+   * @param {number} rotation Degrees of rotation of the speech bubble path element
+   */
   startNotification(notification, parentNode, rotation = 0) {
     var bubbleGroup = document.createElementNS(xmlns, "g"); //make group to apply rotation
     bubbleGroup.setAttributeNS(null, "transform", "rotate(" + rotation + ")");
@@ -705,6 +771,10 @@ class Svg {
     }, 7000);
   }
 
+  /**
+   * Draw all relevant game status and other information like players, board, pot etc.
+   * @param {PokerTable} pokertable The pokertable to draw
+   */
   drawTable(pokertable) {
     console.log("SVG.drawTable()");
     console.log("pokertable: ", pokertable);
@@ -870,10 +940,17 @@ class Svg {
     this.updatePot(pokertable.pot);
   }
 
+  /**
+   * Simply updates the textual content of the pot text node
+   * @param {*} potValue The current pot value
+   */
   updatePot(potValue) {
     this.potAmountContent.nodeValue = "$ " + potValue;
   }
 
+  /**
+   * Automatically adjusts the pot translation.
+   */
   setPotTranslations() {
     //this is called in view.displayTable() after svg has been appended, so that BBox can be calculated
     console.log("Svg.setPotTranslations()");
@@ -889,6 +966,12 @@ class Svg {
     this.potDivider.setAttributeNS(null, "width", potTitleWidth + 2);
   }
 
+  /**
+   * Redraws the board (flop, turn and river cards).
+   * @param {Array} flop Array of Objects representing cards of the flop
+   * @param {Object} turn Object representing "turn" card
+   * @param {Object} river Object representing "river" card
+   */
   updateBoard(flop, turn, river) {
     console.log("SVG.updateBoard()");
 
@@ -927,6 +1010,11 @@ class Svg {
     this.boardGroup.appendChild(riverNode);
   }
 
+  /**
+   * Creates a SVGGElement representing a board card
+   * @param {Object} card Object representing a card's values
+   * @return {SVGGElement}
+   */
   getBoardCardNode(card = null) {
     var height = cardHeight;
     var width = cardWidth;
@@ -1021,6 +1109,11 @@ class Svg {
     return cardGroup;
   }
 
+  /**
+   * Just creates an SVGTextElement containing info text to indicate that a given player hast lost the game
+   * @param {Object} player Object representing a player
+   * @return {SVGTextElement}
+   */
   getOtherPlayerLostText(player) {
     var oopsTextNode = this.createTextNode(
       player.username + " lost all their money!"
@@ -1030,6 +1123,12 @@ class Svg {
     return oopsTextNode;
   }
 
+  /**
+   * Checks if a given playerId has lost the game or has not entered the game yet.
+   * @param {number} playerId player's ID to be checked
+   * @param {PokerTable} pokertable The pokertable game information
+   * @param {*} parentNode The node that the calculated information will be appended to.
+   */
   handleOtherPlayerLostOrWaiting(playerId, pokertable, parentNode) {
     var playerLost = null;
     for (let player of pokertable.playersLost) {
@@ -1047,6 +1146,10 @@ class Svg {
     }
   }
 
+  /**
+   * Creates an SVGGElement that visualizes a Dealer button and appends it to a given parent element
+   * @param {*} parentNode The node the dealer button object will be appended to.
+   */
   appendDealerButton(parentNode) {
     var buttonGroup = document.createElementNS(xmlns, "g");
     buttonGroup.setAttributeNS(
@@ -1068,6 +1171,10 @@ class Svg {
     alignSvgObject(buttonTextNode, 1 / 4);
   }
 
+  /**
+   * Checks if the client player theirself has lost the game and displays the information accordingly, if so.
+   * @param {PokerTable} pokertable The pokertable game information
+   */
   checkPlayerSelfLost(pokertable) {
     for (let playerLost of pokertable.playersLost) {
       if (playerLost.id == pokertable.playerId) {
@@ -1100,6 +1207,13 @@ class Svg {
     }
   }
 
+  /**
+   * Checks if a given player just made a small/big blind and displays the information
+   * @param {PokerTable} pokertable The pokertable game information
+   * @param {Object} player The player to check if she made a blind bet.
+   * @param {*} notificationGroupNode the parent node a possible speech bubble notification will be appended to
+   * @param {number} bubbleRotation Rotation of the speech bubble that contains the blind info
+   */
   checkBlinds(pokertable, player, notificationGroupNode, bubbleRotation) {
     var smallBlindId = (pokertable.dealerId + 1) % 4;
     var bigBlindId = (pokertable.dealerId + 2) % 4;
@@ -1121,6 +1235,12 @@ class Svg {
     }
   }
 
+  /**
+   * Appends cards to the player's informations and does so with a timeout to simulate dealing of cards if a new round just started.
+   * @param {SvgPlayer} svgPlayer An object containing information of a player and methods to display this information.
+   * @param {PokerTable} pokertable The pokertable game information
+   * @param {*} playerGroupNode the parent node the card objects will be appended to
+   */
   dealCards(svgPlayer, pokertable, playerGroupNode) {
     if (pokertable.lastAction) {
       //if New Round, delay Display of Cards until Blinds have been set
@@ -1156,6 +1276,12 @@ class Svg {
     }
   }
 
+  /**
+   * Shows an pulsing ellipse behind a player to indicate that this is the active player
+   * @param {number} playerId the ID of the player to check if it's the active player
+   * @param {PokerTable} pokertable The pokertable game information
+   * @param {*} playerGroupNode the parent node the ellipse will be appended to
+   */
   indicateIsActive(playerId, pokertable, parentNode) {
     while (parentNode.firstChild) {
       parentNode.removeChild(parentNode.firstChild);
@@ -1172,6 +1298,10 @@ class Svg {
     }
   }
 
+  /**
+   * Initiates showing a speech bubble to indicate the last action
+   * @param {PokerTable} pokertable The pokertable game information
+   */
   showLastAction(pokertable) {
     var lastPlayer = null;
     for (let player of pokertable.players) {
@@ -1207,6 +1337,10 @@ class Svg {
     }
   }
 
+  /**
+   * Resolves a round by displaying information about the winner and the winning hand
+   * @param {PokerTable} pokertable The pokertable game information
+   */
   resolveRound(pokertable) {
     console.log("Svg.resolveRound()");
 
@@ -1246,6 +1380,14 @@ class Svg {
     textNodeWinners.setAttributeNS(null, "transform", "scale(1.75)");
   }
 
+  /**
+   * On showdown, the players that have no money left are already in the playersLost Array of the pokertable.
+   * To still show their hand we check if they have lost just in the recent round by checking if they still have a pair of cards,
+   * and if so, dealing them their hand once more to display it.
+   * @param {number} playerId ID of the player to check
+   * @param {PokerTable} pokertable The pokertable game information
+   * @param {*} parentNode the parent node the card objects will be appended to
+   */
   checkPlayerLostOnShowdown(playerId, pokertable, parentNode) {
     var player = pokertable.playersLost.find((player) => player.id == playerId);
 
@@ -1256,6 +1398,10 @@ class Svg {
     }
   }
 
+  /**
+   * A simple method that displays a rectangle and a text indicating the winner of the game.
+   * @param {String} resultString The String containing the information about the winner.
+   */
   showGameWinner(resultString) {
     var resultBox = document.createElementNS(xmlns, "g");
     resultBox.setAttributeNS(null, "transform", "translate(50 25)");

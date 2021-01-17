@@ -142,9 +142,8 @@ class View {
   createAllinImg() {
     var allin = this.createElement("img");
     allin.id = "allin";
-    allin.src = "chips.png";
+    allin.src = "chips.svg";
     allin.draggable = "true";
-    allin.style.width = "20%";
 
     allin.addEventListener("dragstart", (event) => {
       this.handleDragStart(event);
@@ -188,18 +187,32 @@ class View {
     this.svg.drawTable(pokertable);
   }
 
+  /**
+   * Update players in View
+   * @param {PokerTable} pokertable The pokertable to draw
+   */
   updatePlayers(pokertable) {
     console.log("View.updatePlayers()");
 
     this.svg.drawTable(pokertable);
   }
 
+  /**
+   * Update cards on the board in view
+   * @param {Array} flop Array of Objects representing cards of the flop
+   * @param {Object} turn Object representing "turn" card
+   * @param {Object} river Object representing "river" card
+   */
   updateBoard(flop, turn, river) {
     console.log("View.updateBoard()");
 
     this.svg.updateBoard(flop, turn, river);
   }
 
+  /**
+   * Update the whole game status, show actions by players and resolve round if necessary
+   * @param {PokerTable} pokertable The pokertable to draw
+   */
   updateTable(pokertable) {
     console.log("View.updateTable()");
 
@@ -228,6 +241,10 @@ class View {
     }
   }
 
+  /**
+   * display game result
+   * @param {String} resultString Textual information about who wins the game
+   */
   showResult(resultString) {
     this.svg.showGameWinner(resultString);
   }
