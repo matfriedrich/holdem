@@ -57,14 +57,14 @@ function handleMessage(ws, message) {
   switch (msg.type) {
     case "join":
       //console.log('Received join from client');
-      var joinWasSuccessful = pokerTable.addPlayer(msg.name, msg.id);
-      if (joinWasSuccessful) pokerTable.addConnection(ws);
+      var playerId = pokerTable.addPlayer(msg.name, msg.id);
+      if (playerId >= 0) pokerTable.addConnection(ws);
       var joinMessageForJoiner = pokerTable.getJoinMessageForJoiner(
-        joinWasSuccessful
+          playerId
       );
       ws.send(JSON.stringify(joinMessageForJoiner));
-      if (joinWasSuccessful) {
-        var joinMessageForOthers = pokerTable.getJoinMessageForOthers();
+      if (playerId >= 0) {
+        var joinMessageForOthers = pokerTable.getJoinMessageForOthers(playerId);
         wss.clients.forEach(function each(client) {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify(joinMessageForOthers));

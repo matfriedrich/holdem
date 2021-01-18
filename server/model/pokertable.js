@@ -66,37 +66,37 @@ class PokerTable {
 
   addPlayer(username, id) {
     var player = this.players.find((player) => player.id == id);
-    if (player !== undefined) return true;
+    if (player !== undefined) return id;
 
     var newPlayer;
     if (this.players.length + this.playersLost.length >= 4) {
-      return false;
+      return -1;
     }
     newPlayer = new Player(0, 1000, actions.noaction, username);
     newPlayer.setId(this.players.length);
     this.players.push(newPlayer);
 
-    return true;
+    return newPlayer.id;
   }
 
-  getJoinMessageForJoiner(joinWasSuccessful) {
+  getJoinMessageForJoiner(playerId) {
     var message = {
       existingplayers: this.players,
     };
     message.type = "join";
 
-    if (joinWasSuccessful) {
+    if (playerId >= 0) {
       message.status = "success";
-      message.player = this.getPlayerById(this.players.length - 1);
+      message.player = this.getPlayerById(playerId);
     } else {
       message.status = "fail";
     }
     return message;
   }
 
-  getJoinMessageForOthers() {
+  getJoinMessageForOthers(playerId) {
     var message = {
-      player: this.getPlayerById(this.players.length - 1),
+      player: this.getPlayerById(playerId),
       existingplayers: this.players,
     };
     message.type = "otherJoin";
