@@ -183,6 +183,7 @@ class View {
     this.removeElement("joinButton")
     this.removeElement("usernameinput")
     this.removeElement("statisticsButton")
+    // this.removeElement("documentation");
     this.main.append(this.svgBox, this.options)
 
     this.svg.setPotTranslations() //called after appending this.svgBox so that the translations can be calculated
